@@ -4,6 +4,7 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include "Window.h"
 #include "UI.h"
+#include "Image.h"
 
 void HandleEvent(SDL_Event& e) {
   if (e.type == SDL_EVENT_MOUSE_MOTION) {
@@ -22,7 +23,11 @@ int main(int, char **)
   Window gameWindow;
   //const SDL_PixelFormatDetails *Fmt = SDL_GetPixelFormatDetails(GameWindow.GetSurface()->format);
 
-  UI uiManager;
+  std::string BASE_PATH{SDL_GetBasePath()};
+  std::string IMAGE_PATH{BASE_PATH + "Assets/sample.bmp"};
+  //UI uiManager;
+  // Image example(IMAGE_PATH); // see huge different in perf
+  Image example(IMAGE_PATH, gameWindow.GetSurface()->format);
 
   // rect.SetHoverColor(SDL_MapRGBA(Fmt, nullptr, 0, 0, 255, 255));
 
@@ -40,7 +45,7 @@ int main(int, char **)
         return 0;
       } else {
         HandleEvent(event);
-        uiManager.HandleEvent(event);
+        //uiManager.HandleEvent(event);
       }
     }
     // 2. Update Objects
@@ -48,7 +53,11 @@ int main(int, char **)
 
     // 3. Render Changes
     gameWindow.Render();
-    uiManager.Render(gameWindow.GetSurface());
+    // uiManager.Render(gameWindow.GetSurface());
+    Uint64 Start{SDL_GetPerformanceCounter()};
+    example.Render(gameWindow.GetSurface());
+    Uint64 Delta{SDL_GetPerformanceCounter() - Start};
+    std::cout << "Time to Render Image: " << Delta << '\n';
 
     gameWindow.Update(); // swap buffers
   }
