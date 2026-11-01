@@ -1,16 +1,17 @@
 #pragma once
 #include <SDL3/SDL.h>
+#include <iostream>
 
 class Rectangle {
 private:
   SDL_Rect Rect;
   
-  Uint32 Color{0};
+  SDL_Color Color{255, 0, 0};
 
   bool isPointerHovering{false};
-  Uint32 HoverColor{0};
+  SDL_Color HoverColor{0};
 
-  bool isWithinRect(int x, int y) {
+  /*bool isWithinRect(int x, int y) {
     // Too far left
     if (x < Rect.x) return false;
     // Too far right
@@ -23,20 +24,28 @@ private:
     // If we got this far, that means the
     // point is within the rectangle
     return true;
+  }*/
+  bool isWithinRect(int x, int y) {
+    SDL_Point MousePosition{ x, y };
+    return SDL_PointInRect(&MousePosition, &Rect);
   }
 
 public:
   Rectangle(
-    const SDL_Rect& Rect,
-    const SDL_PixelFormatDetails* Fmt
+    const SDL_Rect& Rect
+    //const SDL_PixelFormatDetails* Fmt
   )
   : Rect{Rect},
     // Default to red
-    Color{SDL_MapRGB(Fmt, nullptr, 255, 0, 0)}
+    Color{SDL_Color {255, 0, 0, 255}}
   {}
 
-  void Render(SDL_Surface* Surface) const {
-    Uint32 color = isPointerHovering ? HoverColor : Color;
+  virtual ~Rectangle() = default;
+
+  virtual void Render(SDL_Surface* Surface) const {
+    auto [r, g, b, a]{
+      isPointerHovering ? HoverColor : Color
+    };
 
     const auto* Fmt = SDL_GetPixelFormatDetails(
       Surface->format
@@ -45,36 +54,49 @@ public:
     SDL_FillSurfaceRect(
       Surface,
       &Rect, 
-      color
+      SDL_MapRGBA(Fmt, nullptr, r, g, b, 255)
     );
   }
 
+  virtual void OnMouseEnter() {}
+  virtual void OnMouseExit() {}
+  virtual void OnLeftClick() {}
+
   void HandleEvent(SDL_Event& E) {
     if (E.type == SDL_EVENT_MOUSE_MOTION) {
-      // isPointerHovering = isWithinRect(
-        // (int)E.motion.x, (int)E.motion.y
-      // );
-      SDL_Point MousePosition{ (int)E.motion.x, (int)E.motion.y };
-      isPointerHovering = SDL_PointInRect(&MousePosition, &Rect);
+      bool wasPointerHovering{isPointerHovering};
+      isPointerHovering = isWithinRect(
+        (int)E.motion.x, (int)E.motion.y
+      );
+      if (!wasPointerHovering && isPointerHovering) 
+      {
+        OnMouseEnter();
+      } 
+      else if (wasPointerHovering && !isPointerHovering) 
+      {
+        OnMouseExit();
+      }
     } else if (E.type == SDL_EVENT_WINDOW_MOUSE_LEAVE) {
       isPointerHovering = false;
     } else if (E.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-      if (isPointerHovering&& E.button.button == SDL_BUTTON_LEFT) {
-        std::cout << "A left-click happened "
-          "somewhere in the window\n";
+      if (isPointerHovering &&
+        E.button.button == SDL_BUTTON_LEFT
+      ) {
+        std::cout << "A left-click happened on me!\n";
+        OnLeftClick();
       }
     }
   }
 
-  void SetColor(Uint32 NewColor) {
+  void SetColor(const SDL_Color& NewColor) {
     Color = NewColor;
   }
 
-  void SetHoverColor(Uint32 NewColor) {
+  void SetHoverColor(const SDL_Color& NewColor) {
     HoverColor = NewColor;
   }
 
-  Uint32 GetHoverColor() const {
+  SDL_Color GetHoverColor() const {
     return HoverColor;
   }
 };
