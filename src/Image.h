@@ -19,6 +19,7 @@ public:
       if (converted) {
         SDL_DestroySurface(imageSurface);
         imageSurface = converted;
+        SDL_SetSurfaceBlendMode(imageSurface, SDL_BLENDMODE_NONE);
       } else {
         std::cout << "Error converting surface: "
           << SDL_GetError() << '\n';
