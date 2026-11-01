@@ -3,6 +3,7 @@
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include "Window.h"
+#include "Rectangle.h"
 
 void HandleEvent(SDL_Event& E) {
   if (E.type == SDL_EVENT_MOUSE_MOTION) {
@@ -19,6 +20,14 @@ int main(int, char **)
   // Initialization
   SDL_Init(SDL_INIT_VIDEO);
   Window GameWindow;
+  const SDL_PixelFormatDetails *Fmt = SDL_GetPixelFormatDetails(GameWindow.GetSurface()->format);
+
+  Rectangle Rect{
+    SDL_Rect{50, 50, 50, 50}, 
+    Fmt
+  };
+
+  Rect.SetHoverColor(SDL_MapRGBA(Fmt, nullptr, 0, 0, 255, 255));
 
   bool IsRunning = true;
   SDL_Event Event;
@@ -34,6 +43,7 @@ int main(int, char **)
         return 0;
       } else {
         HandleEvent(Event);
+        Rect.HandleEvent(Event);
       }
     }
     // 2. Update Objects
@@ -41,6 +51,9 @@ int main(int, char **)
 
     // 3. Render Changes
     GameWindow.Render();
+    Rect.Render(GameWindow.GetSurface());
+
+    GameWindow.Update(); // swap buffers
   }
 
   SDL_Quit();
