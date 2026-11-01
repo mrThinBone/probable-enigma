@@ -4,56 +4,56 @@
 
 class Rectangle {
 private:
-  SDL_Rect Rect;
+  SDL_Rect rect;
   
-  SDL_Color Color{255, 0, 0};
+  SDL_Color color{255, 0, 0};
 
   bool isPointerHovering{false};
-  SDL_Color HoverColor{0};
+  SDL_Color hoverColor{0};
 
   /*bool isWithinRect(int x, int y) {
     // Too far left
-    if (x < Rect.x) return false;
+    if (x < rect.x) return false;
     // Too far right
-    if (x > Rect.x + Rect.w) return false;
+    if (x > rect.x + rect.w) return false;
     // Too far up
-    if (y < Rect.y) return false;
+    if (y < rect.y) return false;
     // Too far down
-    if (y > Rect.y + Rect.h) return false;
+    if (y > rect.y + rect.h) return false;
 
     // If we got this far, that means the
     // point is within the rectangle
     return true;
   }*/
   bool isWithinRect(int x, int y) {
-    SDL_Point MousePosition{ x, y };
-    return SDL_PointInRect(&MousePosition, &Rect);
+    SDL_Point mousePosition{ x, y };
+    return SDL_PointInRect(&mousePosition, &rect);
   }
 
 public:
   Rectangle(
-    const SDL_Rect& Rect
+    const SDL_Rect& rect
     //const SDL_PixelFormatDetails* Fmt
   )
-  : Rect{Rect},
+  : rect{rect},
     // Default to red
-    Color{SDL_Color {255, 0, 0, 255}}
+    color{SDL_Color {255, 0, 0, 255}}
   {}
 
   virtual ~Rectangle() = default;
 
-  virtual void Render(SDL_Surface* Surface) const {
+  virtual void Render(SDL_Surface* surface) const {
     auto [r, g, b, a]{
-      isPointerHovering ? HoverColor : Color
+      isPointerHovering ? hoverColor : color
     };
 
     const auto* Fmt = SDL_GetPixelFormatDetails(
-      Surface->format
+      surface->format
     );
 
     SDL_FillSurfaceRect(
-      Surface,
-      &Rect, 
+      surface,
+      &rect, 
       SDL_MapRGBA(Fmt, nullptr, r, g, b, 255)
     );
   }
@@ -88,15 +88,15 @@ public:
     }
   }
 
-  void SetColor(const SDL_Color& NewColor) {
-    Color = NewColor;
+  void SetColor(const SDL_Color& newColor) {
+    color = newColor;
   }
 
-  void SetHoverColor(const SDL_Color& NewColor) {
-    HoverColor = NewColor;
+  void SetHoverColor(const SDL_Color& newColor) {
+    hoverColor = newColor;
   }
 
   SDL_Color GetHoverColor() const {
-    return HoverColor;
+    return hoverColor;
   }
 };
