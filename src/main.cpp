@@ -30,7 +30,7 @@ int main(int, char **)
   //CheckSDLError("SDL_Init");
 
   // Image example(IMAGE_PATH); // see different in perf
-  Image example(IMAGE_PATH, gameWindow.GetSurface()->format);
+  Image example(IMAGE_PATH);
   example.ScaleToFit(true);
   //CheckSDLError("LoadImage");
 

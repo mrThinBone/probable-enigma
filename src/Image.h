@@ -1,36 +1,25 @@
 #pragma once
-#include <iostream>
 #include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
+#include <iostream>
 #include <string>
 
 class Image {
 public:
-  Image(
-    const std::string& file,
-    SDL_PixelFormat preferredFormat = SDL_PIXELFORMAT_UNKNOWN
-  ) : imageSurface{SDL_LoadBMP(file.c_str())} {
+  Image(const std::string& file): imageSurface{IMG_Load(file.c_str())} {
     if (!imageSurface) {
       std::cout << "Failed to load image: "
         << file << ":\n  " << SDL_GetError() << '\n';
-    } else if (preferredFormat != SDL_PIXELFORMAT_UNKNOWN) {
 
       // Initialize SourceRectangle to the full image size
       sourceRectangle = {
         0, 0, imageSurface->w, imageSurface->h
       };
 
-      
-      SDL_Surface* converted{ SDL_ConvertSurface(imageSurface, preferredFormat) };
-      
-      if (converted) {
-        SDL_DestroySurface(imageSurface);
-        imageSurface = converted;
-        // huge perf different
-        SDL_SetSurfaceBlendMode(imageSurface, SDL_BLENDMODE_NONE);
-      } else {
-        std::cout << "Error converting surface: "
-          << SDL_GetError() << '\n';
-      }
+      // blending is enabled by default for SDL_Surface objects, but it's good to explicitly set it anyway
+      SDL_SetSurfaceBlendMode(imageSurface, SDL_BLENDMODE_BLEND);
+      // disable
+      // SDL_SetSurfaceBlendMode(imageSurface, SDL_BLENDMODE_NONE);
     }
   }
 
@@ -40,8 +29,43 @@ public:
     }
   }
 
-  Image(const Image&) = delete;
-  Image& operator=(const Image&) = delete;
+  // Image(const Image&) = delete;
+  Image::Image(const Image& source): destinationRectangle(source.destinationRectangle) {
+    // Copy the SDL_Surface using SDL_ConvertSurface
+    if (source.imageSurface) {
+      imageSurface = SDL_ConvertSurface(
+        source.imageSurface,
+        source.imageSurface->format
+      );
+    }
+  }
+  // Image& operator=(const Image&) = delete;
+  Image& Image::operator=(const Image& source) {
+    // Early return for self-assignment
+    if (this == &source) {
+      return *this;
+    }
+
+    // Free current resources
+    if (imageSurface) {
+      SDL_DestroySurface(imageSurface);
+    }
+
+    // Copy the SDL_Surface using SDL_ConvertSurface
+    if (source.imageSurface) {
+      imageSurface = SDL_ConvertSurface(
+        source.imageSurface,
+        source.imageSurface->format
+      );
+    } else {
+      imageSurface = nullptr;
+    }
+
+    // Copy the other member variables too
+    destinationRectangle = source.destinationRectangle;
+
+    return *this;
+  }
 
   void Render(SDL_Surface* destinationSurface) {
     if (!imageSurface) return;
@@ -115,20 +139,13 @@ public:
     return {imageSurface->w, imageSurface->h};
   }
 
-  void Crop(int x, int y, int w, int h) {
-    sourceRectangle.x = x;
-    sourceRectangle.y = y;
-    sourceRectangle.w = w;
-    sourceRectangle.h = h;
-  }
-
-  void Move(int x, int y) {
-    destinationRectangle.x = x;
-    destinationRectangle.y = y;
-  }
-
   void ScaleToFit(bool scale) {
     scaleToFit = scale;
+  }
+
+  void SaveToFile(const std::string& location) const {
+    if (!imageSurface) return;
+    IMG_SavePNG(imageSurface, location.c_str());
   }
 
 private:

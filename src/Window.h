@@ -43,6 +43,12 @@ public:
   void Update() {
     SDL_UpdateWindowSurface(sdlWindow);
   }
+
+  void TakeScreenshot() const {
+    IMG_SaveJPG(
+      GetSurface(), "Screenshot.jpg", 90
+    );
+  }
   
 private:
   SDL_Window* sdlWindow{nullptr};
