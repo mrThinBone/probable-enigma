@@ -5,6 +5,7 @@
 #include "Window.h"
 #include "UI.h"
 #include "Image.h"
+#include "ErrorHandling.h"
 
 void HandleEvent(SDL_Event& e) {
   if (e.type == SDL_EVENT_MOUSE_MOTION) {
@@ -20,15 +21,21 @@ int main(int, char **)
 {
   // Initialization
   SDL_Init(SDL_INIT_VIDEO);
-  Window gameWindow;
+  Window gameWindow(700, 350);
   //const SDL_PixelFormatDetails *Fmt = SDL_GetPixelFormatDetails(GameWindow.GetSurface()->format);
 
   std::string BASE_PATH{SDL_GetBasePath()};
   std::string IMAGE_PATH{BASE_PATH + "Assets/sample.bmp"};
   //UI uiManager;
-  // Image example(IMAGE_PATH); // see huge different in perf
-  Image example(IMAGE_PATH, gameWindow.GetSurface()->format);
+  //CheckSDLError("SDL_Init");
 
+  // Image example(IMAGE_PATH); // see different in perf
+  Image example(IMAGE_PATH, gameWindow.GetSurface()->format);
+  example.ScaleToFit(true);
+  //CheckSDLError("LoadImage");
+
+  // example.Crop(0, 0, 100, 50);
+  
   // rect.SetHoverColor(SDL_MapRGBA(Fmt, nullptr, 0, 0, 255, 255));
 
   bool isRunning = true;

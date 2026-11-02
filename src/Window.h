@@ -4,10 +4,10 @@
 
 class Window {
 public:
-  Window() {
+  Window(int w, int h) {
     sdlWindow = SDL_CreateWindow(
       "Hello Window",
-      800, 300, 0
+      w, h, 0
     );
     
     SDL_GetWindowSurface(sdlWindow);
