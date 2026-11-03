@@ -5,6 +5,7 @@
 #include "Window.h"
 #include "UI.h"
 #include "Image.h"
+#include "Text.h"
 #include "ErrorHandling.h"
 
 void HandleEvent(SDL_Event& e) {
@@ -21,17 +22,25 @@ int main(int, char **)
 {
   // Initialization
   SDL_Init(SDL_INIT_VIDEO);
+  TTF_Init();
+  if (!TTF_Init()) {
+    std::cout << "Error initializing SDL_ttf: " << SDL_GetError() << std::endl;
+  }
   Window gameWindow(700, 350);
   //const SDL_PixelFormatDetails *Fmt = SDL_GetPixelFormatDetails(GameWindow.GetSurface()->format);
 
-  std::string BASE_PATH{SDL_GetBasePath()};
-  std::string IMAGE_PATH{BASE_PATH + "Assets/sample.bmp"};
+  // std::string BASE_PATH{SDL_GetBasePath()};
+  // std::string IMAGE_PATH{BASE_PATH + "Assets/box.png"};
   //UI uiManager;
   //CheckSDLError("SDL_Init");
+  // find fonts cmd-line : fc-list | grep Roboto
+  Text helloText{"Hello World", "/usr/share/fonts/truetype/noto/NotoSansDisplay-Regular.ttf"};
+  helloText.Position(50, 50);
+  // helloText.SetScale(4,4);
 
   // Image example(IMAGE_PATH); // see different in perf
-  Image example(IMAGE_PATH);
-  example.ScaleToFit(true);
+  // Image example(IMAGE_PATH);
+  // example.ScaleToFit(true);
   //CheckSDLError("LoadImage");
 
   // example.Crop(0, 0, 100, 50);
@@ -61,14 +70,16 @@ int main(int, char **)
     // 3. Render Changes
     gameWindow.Render();
     // uiManager.Render(gameWindow.GetSurface());
-    Uint64 Start{SDL_GetPerformanceCounter()};
-    example.Render(gameWindow.GetSurface());
-    Uint64 Delta{SDL_GetPerformanceCounter() - Start};
-    std::cout << "Time to Render Image: " << Delta << '\n';
+    Uint64 start{SDL_GetPerformanceCounter()};
+    // example.Render(gameWindow.GetSurface());
+    Uint64 delta{SDL_GetPerformanceCounter() - start};
+    std::cout << "Time to Render Image: " << delta << '\n';
+    helloText.Render(gameWindow.GetSurface());
 
     gameWindow.Update(); // swap buffers
   }
 
+  TTF_Quit();
   SDL_Quit();
   return 0;
 }

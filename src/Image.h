@@ -30,7 +30,7 @@ public:
   }
 
   // Image(const Image&) = delete;
-  Image::Image(const Image& source): destinationRectangle(source.destinationRectangle) {
+  Image(const Image& source): destinationRectangle(source.destinationRectangle) {
     // Copy the SDL_Surface using SDL_ConvertSurface
     if (source.imageSurface) {
       imageSurface = SDL_ConvertSurface(
@@ -40,7 +40,7 @@ public:
     }
   }
   // Image& operator=(const Image&) = delete;
-  Image& Image::operator=(const Image& source) {
+  Image& operator=(const Image& source) {
     // Early return for self-assignment
     if (this == &source) {
       return *this;
