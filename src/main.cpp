@@ -6,6 +6,8 @@
 #include "UI.h"
 #include "Image.h"
 #include "Text.h"
+#include "WrappedText.h"
+#include "TruncatedText.h"
 #include "ErrorHandling.h"
 
 void HandleEvent(SDL_Event& e) {
@@ -34,8 +36,30 @@ int main(int, char **)
   //UI uiManager;
   //CheckSDLError("SDL_Init");
   // find fonts cmd-line : fc-list | grep Roboto
-  Text helloText{"Hello World", "/usr/share/fonts/truetype/noto/NotoSansDisplay-Regular.ttf"};
-  helloText.Position(50, 50);
+  const char* fontFile{"/usr/share/fonts/truetype/noto/NotoSansDisplay-Regular.ttf"};
+
+  Text helloText{"Hello World", fontFile};
+  helloText.Position(0, 0);
+  helloText.AntiAliasing(false);
+  helloText.SetBackgroundColor({0,0,0,0});
+
+  TruncatedText truncatedText{
+    "The quick brown fox jumps over the lazy dog",
+    fontFile,
+    36.0f,
+    gameWindow.GetWidth()
+  };
+  truncatedText.Position(0, 35);
+
+  WrappedText wrappedText{
+    "The quick brown fox jumps over the lazy dog",
+    fontFile,
+    36.0f,
+    gameWindow.GetWidth()
+  };
+  wrappedText.Position(0, 95);
+
+
   // helloText.SetScale(4,4);
 
   // Image example(IMAGE_PATH); // see different in perf
@@ -72,9 +96,14 @@ int main(int, char **)
     // uiManager.Render(gameWindow.GetSurface());
     Uint64 start{SDL_GetPerformanceCounter()};
     // example.Render(gameWindow.GetSurface());
-    Uint64 delta{SDL_GetPerformanceCounter() - start};
-    std::cout << "Time to Render Image: " << delta << '\n';
+    // Uint64 delta{SDL_GetPerformanceCounter() - start};
+    // std::cout << "Time to Render Image: " << delta << '\n';
     helloText.Render(gameWindow.GetSurface());
+    Uint64 delta{SDL_GetPerformanceCounter() - start};
+    std::cout << "Time to Render Text: " << delta << '\n';
+
+    truncatedText.Render(gameWindow.GetSurface());
+    wrappedText.Render(gameWindow.GetSurface());
 
     gameWindow.Update(); // swap buffers
   }

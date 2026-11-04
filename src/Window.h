@@ -4,7 +4,7 @@
 
 class Window {
 public:
-  Window(int w, int h) {
+  Window(int w, int h) : width(w) {
     sdlWindow = SDL_CreateWindow(
       "Hello Window",
       w, h, 0
@@ -49,7 +49,10 @@ public:
       GetSurface(), "Screenshot.jpg", 90
     );
   }
+
+  int GetWidth() const { return width; }
   
 private:
   SDL_Window* sdlWindow{nullptr};
+  int width{0};
 };

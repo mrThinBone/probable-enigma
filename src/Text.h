@@ -2,6 +2,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <string>
+#include <iostream>
 
 class Text {
  public:
@@ -38,6 +39,15 @@ class Text {
     destinationRectangle.y = y;
   }
 
+  void AntiAliasing(bool value) {
+    antiAliasing = value;
+  }
+
+  void SetBackgroundColor(const SDL_Color& color) {
+    bgColor = color;
+    shaded = true;
+  }
+
   ~Text() {
     SDL_DestroySurface(textSurface);
 
@@ -49,21 +59,59 @@ class Text {
   Text(const Text&) = delete;
   Text& operator=(const Text&) = delete;
 
-private:
+protected:
   TTF_Font* font{nullptr};
   SDL_Surface* textSurface{nullptr};
   SDL_Rect destinationRectangle{0,0,0,0};
 
+  SDL_Color textColor {255, 255, 255, 255}; // White
+
+  bool antiAliasing {true};
+  SDL_Color bgColor {0,0,0,0};
+
+  bool shaded{false};
+
   void CreateSurface(const std::string &content)
   {
-    SDL_Surface *newSurface{
-        TTF_RenderText_Blended(
+    SDL_Surface *newSurface{nullptr};
+    // Rasterization: generate pixel data from the provided font and text
+    // Blitting:      copy pixel data from one surface to another
+    if (antiAliasing) {
+      if (shaded) {
+        newSurface = TTF_RenderText_Shaded( // Faster Blitting - Shaded
+              font,
+              content.c_str(),
+              0,              // Use the null-terminator to find length
+              textColor,      // text color
+              bgColor         // Background color
+          );
+      } else
+        newSurface = TTF_RenderText_Blended(
             font,
             content.c_str(),
-            0,                            // Use the null-terminator to find length
-            SDL_Color{255, 255, 255, 255} // White
-        )
-    };
+            0,                            
+            textColor 
+        );
+      
+    } else {
+      if (shaded) {
+        newSurface = TTF_RenderText_LCD( // faster Rasterization and Blitting
+              font,
+              content.c_str(),
+              0,
+              textColor,
+              bgColor
+        );
+      } else {
+        newSurface = TTF_RenderText_Solid( // Faster Rasterization - Solid
+              font,
+              content.c_str(),
+              0,
+              textColor
+        );
+      }
+    }
+
     if (newSurface)
     {
       SDL_DestroySurface(textSurface);
