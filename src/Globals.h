@@ -15,12 +15,12 @@ namespace Config{
   // Game Settings
   inline const std::string GAME_NAME{
     "Snake"};
-  inline constexpr int GRID_COLUMNS{8};
-  inline constexpr int GRID_ROWS{4};
+  inline constexpr int GRID_COLUMNS{16};
+  inline constexpr int GRID_ROWS{5};
 
   // Size and Positioning
   inline constexpr int PADDING{5};
-  inline constexpr int CELL_SIZE{50};
+  inline constexpr int CELL_SIZE{36};
 
   inline constexpr int GRID_HEIGHT{
     CELL_SIZE * GRID_ROWS
@@ -32,12 +32,10 @@ namespace Config{
     PADDING * (GRID_COLUMNS - 1)};
 
   inline constexpr int WINDOW_HEIGHT{
-    //GRID_HEIGHT + PADDING * 2
-    400
+    GRID_HEIGHT + PADDING * 2
   };
   inline constexpr int WINDOW_WIDTH{
-    //GRID_WIDTH + PADDING * 2
-    800
+    GRID_WIDTH + PADDING * 2
   };
 
   inline constexpr SDL_Color BUTTON_CLEARED_COLOR{
@@ -49,6 +47,13 @@ namespace Config{
     85, 138, 52, 255};
   inline constexpr SDL_Color FONT_COLOR{
     255, 255, 255, 255};
+  inline constexpr SDL_Color CELL_COLOR_A{
+    171, 214, 82, 255};
+  inline constexpr SDL_Color CELL_COLOR_B{
+    161, 208, 74, 255};
+  inline constexpr SDL_Color SNAKE_COLOR{
+    67, 117, 234, 255};
+
   inline constexpr SDL_Color BUTTON_COLOR{
     200, 200, 200, 255};
   inline constexpr SDL_Color BUTTON_HOVER_COLOR{
@@ -61,9 +66,9 @@ namespace Config{
   inline const std::string BOMB_IMAGE{
     BASE_PATH + "Bomb.png"};
   inline const std::string FLAG_IMAGE{
-    BASE_PATH + "Flag.png"};
+    BASE_PATH + "Assets/flag_64.png"};
   inline const std::string FONT{
-    BASE_PATH + "Roboto-Medium.ttf"};
+    BASE_PATH + "Assets/Roboto-Medium.ttf"};
 }
 
 namespace Utils{
