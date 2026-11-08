@@ -15,9 +15,7 @@ public:
   }
 
   void Render(){
-    const auto* Fmt = SDL_GetPixelFormatDetails(
-      GetSurface()->format
-    );
+    const auto* Fmt = SDL_GetPixelFormatDetails(GetSurface()->format);
     SDL_FillSurfaceRect(
       GetSurface(), nullptr,
       SDL_MapRGB(Fmt, nullptr,

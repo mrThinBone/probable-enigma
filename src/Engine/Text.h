@@ -14,25 +14,43 @@ namespace Engine{
       float FontSize = 30.0f
     ) : destinationRect{x, y, w, h},
         color{color}
-    {
-      font = TTF_OpenFont(
-        Config::FONT.c_str(), FontSize);
+    {      
+      font = TTF_OpenFont(Config::FONT.c_str(), FontSize);
+
 #ifdef SHOW_DEBUG_HELPERS
       Utils::CheckSDLError("TTF_OpenFont");
 #endif
+
       SetText(Content);
+    }
+
+    Text(const std::string& initialText, int fontSize)
+      : content(initialText),
+        font(nullptr),
+        textSurface(nullptr)
+    {
+
+      font = TTF_OpenFont(Config::FONT.c_str(), (float)fontSize);
+
+#ifdef SHOW_DEBUG_HELPERS
+      Utils::CheckSDLError("TTF_OpenFont");
+#endif
+
+      SetText(initialText);
+
     }
 
     void SetText(const std::string& text){
       SetText(text, color);
     }
 
-    void SetText(const std::string& text,
-                 SDL_Color newColor){
+    void SetText(const std::string& text, SDL_Color newColor)
+    {
       if (textSurface) {
         SDL_DestroySurface(textSurface);
       }
       color = newColor;
+      content = text;
 
       textSurface = TTF_RenderText_Blended(
         font, text.c_str(), 0, color
@@ -73,6 +91,7 @@ namespace Engine{
     Text& operator=(const Text&) = delete;
 
   private:
+    std::string content;
     SDL_Surface* textSurface{nullptr};
     TTF_Font* font{nullptr};
     SDL_Rect destinationRect{0, 0, 0, 0};

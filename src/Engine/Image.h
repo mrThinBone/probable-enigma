@@ -9,25 +9,41 @@ namespace Engine{
   public:
     Image(
       int x, int y, int w, int h,
-      const std::string& Filename,
-      int Padding = 12
-    ): destination{
-      x + Padding/2, y + Padding/2,
-      w-Padding, h-Padding
-    }{
-      imageSurface = IMG_Load(Filename.c_str());
+      const std::string& filename,
+      int padding = 12
+    ): destination{ x + padding/2, y + padding/2, w-padding, h-padding }
+    {
+
+      imageSurface = IMG_Load(filename.c_str());
+
 #ifdef SHOW_DEBUG_HELPERS
       Utils::CheckSDLError("IMG_Load");
 #endif
     }
 
-    void Render(SDL_Surface* Surface) {
+    Image(const std::string& path) {
+
+      imageSurface = IMG_Load(path.c_str());
+
+#ifdef SHOW_DEBUG_HELPERS
+      Utils::CheckSDLError("IMG_Load");
+#endif
+    }
+
+    void Render(SDL_Surface* surface) {
       SDL_BlitSurfaceScaled(
-        imageSurface, nullptr,
-        Surface, &destination,
-        SDL_SCALEMODE_LINEAR
+        imageSurface, nullptr, surface, 
+        &destination, SDL_SCALEMODE_LINEAR
       );
     }
+
+    void Render(SDL_Surface* surface, SDL_Rect* rect) {
+      SDL_BlitSurfaceScaled(
+        imageSurface, nullptr, surface, 
+        rect, SDL_SCALEMODE_LINEAR
+      );
+    }
+
 
     ~Image() {
       if (imageSurface) {

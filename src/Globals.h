@@ -14,7 +14,7 @@ namespace UserEvents{
 namespace Config{
   // Game Settings
   inline const std::string GAME_NAME{
-    "Minesweeper"};
+    "Snake"};
   inline constexpr int GRID_COLUMNS{8};
   inline constexpr int GRID_ROWS{4};
 
@@ -32,10 +32,12 @@ namespace Config{
     PADDING * (GRID_COLUMNS - 1)};
 
   inline constexpr int WINDOW_HEIGHT{
-    GRID_HEIGHT + PADDING * 2
+    //GRID_HEIGHT + PADDING * 2
+    400
   };
   inline constexpr int WINDOW_WIDTH{
-    GRID_WIDTH + PADDING * 2
+    //GRID_WIDTH + PADDING * 2
+    800
   };
 
   inline constexpr SDL_Color BUTTON_CLEARED_COLOR{
@@ -44,11 +46,14 @@ namespace Config{
 
   // Colors
   inline constexpr SDL_Color BACKGROUND_COLOR{
-    170, 170, 170, 255};
+    85, 138, 52, 255};
+  inline constexpr SDL_Color FONT_COLOR{
+    255, 255, 255, 255};
   inline constexpr SDL_Color BUTTON_COLOR{
     200, 200, 200, 255};
   inline constexpr SDL_Color BUTTON_HOVER_COLOR{
     220, 220, 220, 255};
+  
 
   // Asset Paths
   inline const std::string BASE_PATH{
@@ -63,12 +68,12 @@ namespace Config{
 
 namespace Utils{
 #ifdef SHOW_DEBUG_HELPERS
-  inline void CheckSDLError(
-    const std::string& Msg){
+  inline void CheckSDLError(const std::string& Msg)
+  {
     const char* error = SDL_GetError();
+    
     if (*error != '\0') {
-      std::cerr << Msg << " Error: " << error <<
-        '\n';
+      std::cerr << Msg << " Error: " << error << '\n';
       SDL_ClearError();
     }
   }
