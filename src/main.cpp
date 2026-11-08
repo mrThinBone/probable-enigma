@@ -13,6 +13,32 @@
 // download assets at https://www.studyplan.dev/sdl3/sdl3-minesweeper-engine-overview
 using namespace std::chrono;
 
+// Handler
+void HandleKeyboard(const SDL_KeyboardEvent& E) {
+  std::cout
+    << "Key Pressed! Key Code: "
+    << E.key
+    << ", Key Name: "
+    << SDL_GetKeyName(E.key)
+    << '\n';
+
+  if (E.down && E.key == SDLK_SPACE) {
+    std::cout << "\nSpace bar was pressed - " << (E.repeat ? "Repeat" : "Initial");
+  } else if (!E.down && E.key == SDLK_SPACE) {
+    std::cout << "Space bar was released\n";
+  }
+
+  if (E.key == SDLK_UP) {
+    // Up Arrow
+  } else if (E.key == SDLK_DOWN) {
+    // Down Arrow
+  } else if (E.key == SDLK_LEFT) {
+    // Left Arrow
+  } else if (E.key == SDLK_RIGHT) {
+    // Right Arrow
+  }
+}
+
 int main(int, char**){
   SDL_Init(SDL_INIT_VIDEO);
 #ifdef SHOW_DEBUG_HELPERS
@@ -51,6 +77,7 @@ int main(int, char**){
         shouldQuit = true;
       } else if (event.type == SDL_EVENT_KEY_DOWN) {
         enemySpawner.HandleKeyDownEvent(event.key);
+        HandleKeyboard(event.key);
       }
     }
 
