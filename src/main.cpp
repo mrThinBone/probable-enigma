@@ -8,6 +8,7 @@
 #include "Engine/Window.h"
 #include "Next/World.h"
 #include "Next/Goblin.h"
+#include "Next/Spawner.h"
 
 // download assets at https://www.studyplan.dev/sdl3/sdl3-minesweeper-engine-overview
 using namespace std::chrono;
@@ -24,12 +25,12 @@ int main(int, char**){
 #endif
 
   Engine::Window gameWindow;
-  World gameWorld;
+
 
   auto start{high_resolution_clock::now()};
-  Goblin& enemy{
-    gameWorld.SpawnObject<Goblin>("Goblin", 100, 200)
-  };
+  
+  Spawner enemySpawner;
+  
   auto end{high_resolution_clock::now()};
   duration<double> timeDelta{end - start};
   std::cout << "TimeDelta: "
@@ -48,22 +49,20 @@ int main(int, char**){
     while (SDL_PollEvent(&event)) {
       if (event.type == SDL_EVENT_QUIT) {
         shouldQuit = true;
-      } else { 
-        gameWorld.HandleEvent(event); 
+      } else if (event.type == SDL_EVENT_KEY_DOWN) {
+        enemySpawner.HandleKeyDownEvent(event.key);
       }
     }
 
     // Update Objects
     Uint64 thisFrame{SDL_GetTicks()};
-    Uint64 timeDelta{thisFrame - previousFrame};
+    Uint64 timeDelta2{thisFrame - previousFrame};
     
     previousFrame = thisFrame;
 
-    gameWorld.Tick(timeDelta / 1000.0f); // convert milliseconds to seconds
 
     // Render Objects
     gameWindow.Render();
-    gameWorld.Render(gameWindow.GetSurface());
 
     gameWindow.Update();
 
