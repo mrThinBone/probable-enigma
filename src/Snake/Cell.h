@@ -13,6 +13,8 @@ public:
   void Tick(Uint64 deltaTime);
   void Render(SDL_Surface* surface);
 
+  bool PlaceApple();
+
 private:
   int row;
   int column;

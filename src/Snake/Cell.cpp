@@ -22,6 +22,10 @@ Cell::Cell(int row, int column, Assets& assetList)
 void Cell::HandleEvent(const SDL_Event &event) {
   if (event.type == UserEvents::ADVANCE) {
     Advance(event.user);
+  } else if (event.type == UserEvents::APPLE_EATEN) {
+    if (state == CellState::Snake) {
+      ++snakeDuration;
+    }
   }
 }
 
@@ -83,6 +87,10 @@ void Cell::Advance(const SDL_UserEvent& event) {
   };
 
   if (isThisCell) {
+    if (state == CellState::Apple) {
+      SDL_Event newEvent{ .type = UserEvents::APPLE_EATEN };
+      SDL_PushEvent(&newEvent);
+    }
     state = CellState::Snake;
     snakeDuration = data->length;
   } else if (state == CellState::Snake) {
@@ -91,4 +99,11 @@ void Cell::Advance(const SDL_UserEvent& event) {
       state = CellState::Empty;
     }
   }
+}
+
+bool Cell::PlaceApple() {
+  if (state != CellState::Empty) return false;
+
+  state = CellState::Apple;
+  return true;
 }

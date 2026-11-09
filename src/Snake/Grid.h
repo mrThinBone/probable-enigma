@@ -2,6 +2,7 @@
 #include <vector>
 #include "Cell.h"
 #include "../Globals.h"
+#include "../Engine/Random.h"
 
 class Grid {
 public:
@@ -21,6 +22,9 @@ public:
     for (auto& cell : cells) {
       cell.HandleEvent(event);
     }
+    if (event.type == UserEvents::APPLE_EATEN) {
+      PlaceRandomApple();
+    }
   }
 
   void Tick(Uint64 deltaTime) {
@@ -37,4 +41,15 @@ public:
 
 private:
   std::vector<Cell> cells;
+
+  void PlaceRandomApple() {
+    while (true) {
+      int randomIndex{
+        Engine::Random::Int(0, int(cells.size()) - 1)
+      };
+      if (cells[randomIndex].PlaceApple()) {
+        break;
+      }
+    }
+  }
 };

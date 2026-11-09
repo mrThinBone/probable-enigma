@@ -9,6 +9,8 @@ public:
   void Handleevent(const SDL_Event& event) {
     if (event.type == SDL_EVENT_KEY_DOWN) {
       HandleKeyEvent(event.key);
+    } else if (event.type == UserEvents::APPLE_EATEN) {
+      ++snake.length;
     }
   }
 

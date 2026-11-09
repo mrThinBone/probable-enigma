@@ -10,6 +10,7 @@ namespace UserEvents{
   inline const Uint32 CELL_CLEARED{ SDL_RegisterEvents(1) };
 
   inline const Uint32 ADVANCE{ SDL_RegisterEvents(1) };
+  inline const Uint32 APPLE_EATEN{ SDL_RegisterEvents(1) };
 }
 
 namespace Config{
