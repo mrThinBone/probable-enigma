@@ -70,6 +70,9 @@ namespace Config{
     73, 117, 46, 255};
   inline constexpr SDL_Color BUTTON_HOVER_COLOR{
     220, 220, 220, 255};
+
+  inline constexpr SDL_Color SCORE_BACKGROUND_COLOR{
+    73, 117, 46, 255};
   
 
   // Asset Paths

@@ -3,10 +3,13 @@
 #include "Assets.h"
 #include "Grid.h"
 #include "RestartButton.h"
+#include "ScoreCounter.h"
 
 class SnakeUI {
  public:
-  SnakeUI(Assets& assetList) : grid{assetList},restartBtn{
+  SnakeUI(Assets& assetList) : grid{assetList},
+      scoreCounter{assetList},
+      restartBtn{
         Config::WINDOW_WIDTH - 150,
         Config::GRID_HEIGHT + Config::PADDING * 2,
         150 - Config::PADDING,
@@ -17,6 +20,7 @@ class SnakeUI {
 
   void HandleEvent(const SDL_Event& event) {
     grid.HandleEvent(event);
+    scoreCounter.HandleEvent(event);
     restartBtn.HandleEvent(event);
   }
   void Tick(Uint64 deltaTime) {
@@ -24,6 +28,7 @@ class SnakeUI {
   }
   void Render(SDL_Surface* surface) {
     grid.Render(surface);
+    scoreCounter.Render(surface);
     restartBtn.Render(surface);
   }
 
@@ -31,4 +36,5 @@ class SnakeUI {
   Assets assetList;
   Grid grid;
   RestartButton restartBtn;
+  ScoreCounter scoreCounter;
 };

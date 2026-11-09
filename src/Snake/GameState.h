@@ -1,6 +1,6 @@
 #pragma once
 #include <SDL3/SDL.h>
-#include "../Globals.h"
+#include "Globals.h"
 #include "SnakeData.h"
 
 class GameState {

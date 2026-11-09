@@ -1,7 +1,7 @@
 #pragma once
 #include <SDL3/SDL.h>
-#include "../Globals.h"
-#include "../Engine/Text.h"
+#include "Globals.h"
+#include "Engine/Text.h"
 
 class RestartButton {
 public:

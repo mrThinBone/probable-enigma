@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
 #include "Cell.h"
-#include "../Globals.h"
-#include "../Engine/Random.h"
+#include "Globals.h"
+#include "Engine/Random.h"
 
 class Grid {
 public:
