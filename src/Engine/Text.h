@@ -9,19 +9,19 @@ namespace Engine{
   public:
     Text(
       int x, int y, int w, int h,
-      const std::string& Content,
+      const std::string& content,
       SDL_Color color = {0, 0, 0, 255},
-      float FontSize = 30.0f
+      float fontSize = 30.0f
     ) : destinationRect{x, y, w, h},
         color{color}
     {      
-      font = TTF_OpenFont(Config::FONT.c_str(), FontSize);
+      font = TTF_OpenFont(Config::FONT.c_str(), fontSize);
 
 #ifdef SHOW_DEBUG_HELPERS
       Utils::CheckSDLError("TTF_OpenFont");
 #endif
 
-      SetText(Content);
+      SetText(content);
     }
 
     Text(const std::string& initialText, int fontSize)
@@ -71,10 +71,17 @@ namespace Engine{
       };
     }
 
-    void Render(SDL_Surface* Surface) {
+    void Render(SDL_Surface* surface) {
       SDL_BlitSurface(
         textSurface, nullptr,
-        Surface, &textPosition
+        surface, &textPosition
+      );
+    }
+
+    void Render(SDL_Surface* Surface, SDL_Rect* destinationRect) {
+      SDL_BlitSurface(
+        textSurface, nullptr,
+        Surface, destinationRect
       );
     }
 

@@ -11,6 +11,7 @@ namespace UserEvents{
 
   inline const Uint32 ADVANCE{ SDL_RegisterEvents(1) };
   inline const Uint32 APPLE_EATEN{ SDL_RegisterEvents(1) };
+  inline const Uint32 RESTART_GAME{ SDL_RegisterEvents(1) };
 }
 
 namespace Config{
@@ -33,8 +34,12 @@ namespace Config{
     CELL_SIZE * GRID_COLUMNS +
     PADDING * (GRID_COLUMNS - 1)};
 
+  inline constexpr int FOOTER_HEIGHT{60};
+
   inline constexpr int WINDOW_HEIGHT{
-    GRID_HEIGHT + PADDING * 2
+    GRID_HEIGHT 
+    + FOOTER_HEIGHT
+    + PADDING * 2
   };
   inline constexpr int WINDOW_WIDTH{
     GRID_WIDTH + PADDING * 2
@@ -57,7 +62,7 @@ namespace Config{
     67, 117, 234, 255};
 
   inline constexpr SDL_Color BUTTON_COLOR{
-    200, 200, 200, 255};
+    73, 117, 46, 255};
   inline constexpr SDL_Color BUTTON_HOVER_COLOR{
     220, 220, 220, 255};
   

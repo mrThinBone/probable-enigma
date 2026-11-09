@@ -15,6 +15,8 @@ public:
 
   bool PlaceApple();
 
+  void Reset();
+
 private:
   int row;
   int column;
@@ -34,6 +36,5 @@ private:
   */
   int snakeDuration{0};
 
-  void Initialize();
   void Advance(const SDL_UserEvent& event);
 };

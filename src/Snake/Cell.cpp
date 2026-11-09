@@ -16,7 +16,7 @@ Cell::Cell(int row, int column, Assets& assetList)
           : Config::CELL_COLOR_B
       }
 {
-  Initialize();
+  Reset();
 }
 
 void Cell::HandleEvent(const SDL_Event &event) {
@@ -26,6 +26,8 @@ void Cell::HandleEvent(const SDL_Event &event) {
     if (state == CellState::Snake) {
       ++snakeDuration;
     }
+  } else if (event.type == UserEvents::RESTART_GAME) {
+    Reset();
   }
 }
 
@@ -60,7 +62,7 @@ void Cell::Render(SDL_Surface *surface) {
   }
 }
 
-void Cell::Initialize() {
+void Cell::Reset() {
   
   state = CellState::Empty;
   snakeDuration = 0;

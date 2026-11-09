@@ -6,19 +6,24 @@
 class GameState {
 public:
 
-  void Handleevent(const SDL_Event& event) {
+  void HandleEvent(const SDL_Event& event) {
     if (event.type == SDL_EVENT_KEY_DOWN) {
       HandleKeyEvent(event.key);
     } else if (event.type == UserEvents::APPLE_EATEN) {
       ++snake.length;
+    } else if (event.type == UserEvents::RESTART_GAME) {
+      RestartGame();
     }
   }
 
   void Tick(Uint64 deltaTime) {
+    if (isPaused) return;
+
     elapsedTime += deltaTime;
+
     if (elapsedTime >= Config::ADVANCE_INTERVAL) {
       elapsedTime = 0;
-      Updatesnake();
+      UpdateSnake();
     }
   }
 
@@ -29,7 +34,9 @@ private:
   // game state next advances
   MovementDirection nextDirection{Right};
 
-  void Updatesnake() {
+  bool isPaused{true};
+
+  void UpdateSnake() {
     snake.direction = nextDirection;
     switch (nextDirection) {
       case Up:
@@ -56,28 +63,43 @@ private:
     switch (event.key) {
       case SDLK_UP:
       case SDLK_W:
-        if (snake.Direction != Down) {
+        if (snake.direction != Down) {
           nextDirection = Up;
         }
         break;
       case SDLK_DOWN:
       case SDLK_S:
-        if (snake.Direction != Up) {
+        if (snake.direction != Up) {
           nextDirection = Down;
         }
         break;
       case SDLK_LEFT:
       case SDLK_A:
-        if (snake.Direction != Right) {
+        if (snake.direction != Right) {
           nextDirection = Left;
         }
         break;
       case SDLK_RIGHT:
       case SDLK_D:
-        if (snake.Direction != Left) {
+        if (isPaused) {
+          isPaused = false;
+          nextDirection = Right;
+          UpdateSnake();
+        } else if (snake.direction != Left) {
           nextDirection = Right;
         }
         break;
     }
+  }
+
+  void RestartGame() {
+    elapsedTime = 0;
+
+    snake.headRow = Config::GRID_ROWS / 2;
+    snake.headCol = 3;
+    snake.length = 2;
+    snake.direction = Right;
+
+    nextDirection = Right;
   }
 };
