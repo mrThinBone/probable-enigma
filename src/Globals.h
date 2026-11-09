@@ -12,6 +12,8 @@ namespace UserEvents{
   inline const Uint32 ADVANCE{ SDL_RegisterEvents(1) };
   inline const Uint32 APPLE_EATEN{ SDL_RegisterEvents(1) };
   inline const Uint32 RESTART_GAME{ SDL_RegisterEvents(1) };
+  inline const Uint32 GAME_WON{ SDL_RegisterEvents(1) };
+  inline const Uint32 GAME_LOST{ SDL_RegisterEvents(1) };
 }
 
 namespace Config{
@@ -20,6 +22,9 @@ namespace Config{
     "Snake"};
   inline constexpr int GRID_COLUMNS{16};
   inline constexpr int GRID_ROWS{5};
+
+  inline constexpr int MAX_LENGTH{
+    GRID_COLUMNS * GRID_ROWS};
 
   // Size and Positioning
   inline constexpr int PADDING{5};

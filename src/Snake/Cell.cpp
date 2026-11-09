@@ -89,12 +89,20 @@ void Cell::Advance(const SDL_UserEvent& event) {
   };
 
   if (isThisCell) {
+    if (state == CellState::Snake) { // snake hit itself
+      SDL_Event newEvent{};
+      newEvent.type = UserEvents::GAME_LOST;
+      SDL_PushEvent(&newEvent);
+      return;
+    }
+
     if (state == CellState::Apple) {
       SDL_Event newEvent{ .type = UserEvents::APPLE_EATEN };
       SDL_PushEvent(&newEvent);
     }
     state = CellState::Snake;
     snakeDuration = data->length;
+    
   } else if (state == CellState::Snake) {
     --snakeDuration;
     if (snakeDuration == 0) {
