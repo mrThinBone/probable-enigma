@@ -31,7 +31,14 @@ void Cell::HandleEvent(const SDL_Event &event) {
   }
 }
 
-void Cell::Tick(Uint64 deltaTime) {}
+void Cell::Tick(Uint64 deltaTime) {
+  if (state == CellState::Snake && fillPercent < 1.0f) {
+    GrowHead(float(deltaTime));
+  }
+  else if (state != CellState::Snake && fillPercent > 0.0f) {
+    ShrinkTail(float(deltaTime));
+  }
+}
 
 void Cell::Render(SDL_Surface *surface) {
   const SDL_PixelFormatDetails *fmt = SDL_GetPixelFormatDetails(surface->format);
@@ -49,7 +56,8 @@ void Cell::Render(SDL_Surface *surface) {
   if (state == CellState::Apple) {
     assetList.Apple.Render(surface, &backgroundRect);
 
-  } else if (state == CellState::Snake) {
+  // } else if (state == CellState::Snake) {
+  } else if (fillPercent > 0.0f) {
     Uint32 snakeColor = SDL_MapRGB(
         fmt,
         nullptr,
@@ -57,24 +65,31 @@ void Cell::Render(SDL_Surface *surface) {
         Config::SNAKE_COLOR.g,
         Config::SNAKE_COLOR.b
       );
-    SDL_FillSurfaceRect(surface, &backgroundRect, snakeColor);
+    SDL_FillSurfaceRect(surface, &snakeRect, snakeColor);
 
   }
 }
 
 void Cell::Reset() {
+  snakeRect = backgroundRect;
   
   state = CellState::Empty;
   snakeDuration = 0;
+
+  fillPercent = 0.0f;
+  fillDirection = Right;
+
 
   int middleRow{Config::GRID_ROWS / 2};
 
   if (row == middleRow && column == 2) {
     state = CellState::Snake;
     snakeDuration = 1;
+    fillPercent = 1.0f;
   } else if (row == middleRow && column == 3) {
     state = CellState::Snake;
     snakeDuration = 2;
+    fillPercent = 1.0f;
   } else if (row == middleRow && column == 11) {
     state = CellState::Apple;
   }
@@ -102,12 +117,59 @@ void Cell::Advance(const SDL_UserEvent& event) {
     }
     state = CellState::Snake;
     snakeDuration = data->length;
-    
+
+    fillDirection = data->direction;
+    fillPercent = 0.0f;
+
   } else if (state == CellState::Snake) {
+    
+    // animate snake tail leaving
+    if (snakeDuration == data->length) {
+      fillDirection = data->direction;
+    }
+
     --snakeDuration;
     if (snakeDuration == 0) {
       state = CellState::Empty;
     }
+  }
+}
+
+void Cell::GrowHead(float deltaTime) {
+  using namespace Config;
+  fillPercent += deltaTime / ADVANCE_INTERVAL;
+  if (fillPercent > 1.0f) fillPercent = 1.0f;
+
+  snakeRect = backgroundRect;
+  if (fillDirection == Right) {
+    snakeRect.w = int(CELL_SIZE * fillPercent);
+  } else if (fillDirection == Down) {
+    snakeRect.h = int(CELL_SIZE * fillPercent);
+  } else if (fillDirection == Left) {
+    snakeRect.x = int(backgroundRect.x +
+      CELL_SIZE * (1.0f - fillPercent));
+  } else if (fillDirection == Up) {
+    snakeRect.y = int(backgroundRect.y +
+      CELL_SIZE * (1.0f - fillPercent));
+  }
+}
+
+void Cell::ShrinkTail(float deltaTime) {
+  using namespace Config;
+  fillPercent -= deltaTime / ADVANCE_INTERVAL;
+  if (fillPercent < 0.0f) fillPercent = 0.0f;
+
+  snakeRect = backgroundRect;
+  if (fillDirection == Right) {
+    snakeRect.x = backgroundRect.x +
+      int(CELL_SIZE * (1.0f - fillPercent));
+  } else if (fillDirection == Left) {
+    snakeRect.w = int(CELL_SIZE * fillPercent);
+  } else if (fillDirection == Up) {
+    snakeRect.h = int(CELL_SIZE * fillPercent);
+  } else if (fillDirection == Down) {
+    snakeRect.y = backgroundRect.y +
+      int(CELL_SIZE * (1.0f - fillPercent));
   }
 }
 

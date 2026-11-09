@@ -36,5 +36,17 @@ private:
   */
   int snakeDuration{0};
 
+  /* snake animation var */
+  SDL_Rect snakeRect;
+  // ontrolling how far the snake has slid across our cell
+  // as how much of the cell the snake occupies, ranging from 0.0 (empty) to 1.0 (completely full)
+  float fillPercent{0.0f};
+
+  // indicates where the snake enters the cell (Up, Down, Left, or Right).
+  MovementDirection fillDirection{Right};
+
+  void GrowHead(float deltaTime);
+  void ShrinkTail(float deltaTime);
+
   void Advance(const SDL_UserEvent& event);
 };
