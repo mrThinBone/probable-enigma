@@ -5,7 +5,8 @@
 
 class SnakeUI {
  public:
-  SnakeUI(Assets& assetList) : grid{assetList} {}
+  SnakeUI(Assets& assetList) : grid{assetList} {
+  }
 
   void HandleEvent(const SDL_Event& event) {
     grid.HandleEvent(event);

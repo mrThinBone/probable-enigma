@@ -19,7 +19,11 @@ Cell::Cell(int row, int column, Assets& assetList)
   Initialize();
 }
 
-void Cell::HandleEvent(const SDL_Event &event) {}
+void Cell::HandleEvent(const SDL_Event &event) {
+  if (event.type == UserEvents::ADVANCE) {
+    Advance(event.user);
+  }
+}
 
 void Cell::Tick(Uint64 deltaTime) {}
 
@@ -55,13 +59,36 @@ void Cell::Render(SDL_Surface *surface) {
 void Cell::Initialize() {
   
   state = CellState::Empty;
+  snakeDuration = 0;
+
   int middleRow{Config::GRID_ROWS / 2};
 
   if (row == middleRow && column == 2) {
     state = CellState::Snake;
+    snakeDuration = 1;
   } else if (row == middleRow && column == 3) {
     state = CellState::Snake;
+    snakeDuration = 2;
   } else if (row == middleRow && column == 11) {
     state = CellState::Apple;
+  }
+}
+
+void Cell::Advance(const SDL_UserEvent& event) {
+  SnakeData* data{ static_cast<SnakeData*>(event.data1) };
+  // TODO - Update Cell
+  bool isThisCell{
+    data->headRow == row &&
+    data->headCol == column
+  };
+
+  if (isThisCell) {
+    state = CellState::Snake;
+    snakeDuration = data->length;
+  } else if (state == CellState::Snake) {
+    --snakeDuration;
+    if (snakeDuration == 0) {
+      state = CellState::Empty;
+    }
   }
 }

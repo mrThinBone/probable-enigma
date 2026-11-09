@@ -7,8 +7,9 @@
 #include <string>
 
 namespace UserEvents{
-  inline const Uint32 CELL_CLEARED{
-    SDL_RegisterEvents(1)};
+  inline const Uint32 CELL_CLEARED{ SDL_RegisterEvents(1) };
+
+  inline const Uint32 ADVANCE{ SDL_RegisterEvents(1) };
 }
 
 namespace Config{
@@ -69,6 +70,8 @@ namespace Config{
     BASE_PATH + "Assets/flag_64.png"};
   inline const std::string FONT{
     BASE_PATH + "Assets/Roboto-Medium.ttf"};
+
+  inline constexpr int ADVANCE_INTERVAL{1000};
 }
 
 namespace Utils{
