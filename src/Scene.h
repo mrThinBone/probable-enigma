@@ -6,29 +6,30 @@
 class Scene {
 public:
   Scene() {
-    Objects.emplace_back(
+    objects.emplace_back(
       "dwarf.png", Vec2{100, 200}, *this
     );
   }
 
   void HandleEvent(SDL_Event& E) {
-    for (GameObject& Object : Objects) {
-      Object.HandleEvent(E);
+    for (GameObject& object : objects) {
+      object.HandleEvent(E);
     }
   }
 
-  void Tick(float DeltaTime) {
-    for (GameObject& Object : Objects) {
-      Object.Tick(DeltaTime);
+  void Tick(float deltaTime) {
+    for (GameObject& object : objects) {
+      object.ApplyForce({5.0f * PIXELS_PER_METER, 0});
+      object.Tick(deltaTime);
     }
   }
 
-  void Render(SDL_Surface* Surface) {
-    for (GameObject& Object : Objects) {
-      Object.Render(Surface);
+  void Render(SDL_Surface* surface) {
+    for (GameObject& object : objects) {
+      object.Render(surface);
     }
   }
 
 private:
-  std::vector<GameObject> Objects;
+  std::vector<GameObject> objects;
 };
