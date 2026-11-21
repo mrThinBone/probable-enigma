@@ -26,19 +26,37 @@ public:
 
   // 100 pixels/sec right
   
-  Vec2 direction{1, 0};
-  float MaximumSpeed{2.0f * PIXELS_PER_METER};
+  // Vec2 direction{1, 0};
+  // float MaximumSpeed{2.0f * PIXELS_PER_METER};
 
   // Accelerate 1m/s^2 (50 pixels/s^2) to the left
   // -1.0f * PIXELS_PER_METER, 0.0f
   Vec2 acceleration{0.0f, 0.0f};
 
-  
+  Vec2 GetFrictionForce(float deltaTime) const {
+    // How much force can friction apply
+    float maxMagnitude{GetFrictionCoefficient()
+      * mass * acceleration.y};
+
+    // There is no friction
+    if (maxMagnitude <= 0) return Vec2{0, 0};
+
+    // How much force is required to stop the
+    // object right now
+    float stoppingMagnitude{mass * 
+      velocity.GetLength() / deltaTime};
+
+    // Return the smaller of the two forces
+    return -velocity.Normalize() * std::min(
+      maxMagnitude, stoppingMagnitude);
+  }
 
 private:
   Engine::Image image;
   const Scene& scene;
   float mass{50.0f};
+  
+  float forceTimeRemaining{5.0f};
 
   void Clamp(Vec2& v) const {
     v.x = std::abs(v.x) > 0.1f ? v.x : 0.0f;
@@ -46,7 +64,7 @@ private:
   }
 
   // https://www.studyplan.dev/sdl3/sdl3-force-drag-friction
-  /*
+  
   Vec2 velocity{2.0f * PIXELS_PER_METER, 0.0f};
   
   float dragCoefficient{0.2f};
@@ -74,23 +92,13 @@ private:
     // Default friction amount
     return 0.5f;
   }
-
-  public Vec2 GetFrictionForce(float deltaTime) const {
-    // How much force can friction apply
-    float maxMagnitude{GetFrictionCoefficient()
-      * mass * acceleration.y};
-
-    // There is no friction
-    if (maxMagnitude <= 0) return Vec2{0, 0};
-
-    // How much force is required to stop the
-    // object right now
-    float stoppingMagnitude{Mass * 
-      velocity.GetLength() / deltaTime};
-
-    // Return the smaller of the two forces
-    return -velocity.Normalize() * std::min(
-      maxMagnitude, stoppingMagnitude);
+  
+  void ApplyImpulse(const Vec2& impulse) {
+    velocity += impulse / mass;
   }
-  */
+
+  void ApplyPositionalImpulse(const Vec2& origin, float magnitude) {
+    Vec2 direction{(position - origin).Normalize()};
+    ApplyImpulse(direction * magnitude);
+  }
 };
