@@ -2,12 +2,15 @@
 #include <SDL3/SDL.h>
 #include <vector>
 #include "GameObject.h"
+#include "Config.h"
 
 class Scene {
 public:
   Scene() {
     objects.emplace_back(
-      "dwarf.png", Vec2{100, 200}, *this
+      "dwarf.png", Vec2{100, 200}, *this,
+      1.9f * PIXELS_PER_METER,
+      1.7f * PIXELS_PER_METER
     );
   }
 

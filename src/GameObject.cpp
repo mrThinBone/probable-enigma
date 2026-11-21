@@ -21,6 +21,9 @@ void GameObject::HandleEvent(SDL_Event& event) {
 
 void GameObject::Render(SDL_Surface* surface) {
     image.Render(surface, position);
+#ifdef DRAW_DEBUG_HELPERS
+    bounds.Render(surface);
+#endif
 }
 
 void GameObject::Tick(float deltaTime) {
@@ -48,6 +51,8 @@ void GameObject::Tick(float deltaTime) {
     time += deltaTime;
 
     Clamp(velocity);
+
+    bounds.SetPosition(position); 
 
     std::cout << "\nt = " << time
         << ", Position = " << position;

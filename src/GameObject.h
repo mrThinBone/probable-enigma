@@ -2,6 +2,7 @@
 #include <SDL3/SDL.h>
 #include "Engine/Vec2.h"
 #include "Engine/Image.h"
+#include "Engine/BoundingBox.h"
 #include "Scene.h"
 #include "Config.h"
 
@@ -12,9 +13,16 @@ public:
   GameObject(
     const std::string& imagePath,
     const Vec2& initialPosition,
-    const Scene& scene ) : image{imagePath},
-                           position{initialPosition},
-                           scene{scene} {}
+    const Scene& scene,
+    float width,
+    float height
+  ) :                     image{imagePath},
+                          position{initialPosition},
+                          scene{scene},
+                          bounds{ SDL_FRect{
+                            initialPosition.x, initialPosition.y,
+                            width, height
+                          } } {}
 
   void HandleEvent(SDL_Event& event) {}
   void Tick(float deltaTime) {}
@@ -54,6 +62,7 @@ public:
 private:
   Engine::Image image;
   const Scene& scene;
+  BoundingBox bounds;
   float mass{50.0f};
   
   float forceTimeRemaining{5.0f};
