@@ -2,7 +2,8 @@
 #include <string>
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
-#include "../Globals.h"
+#include "Globals.h"
+#include "Vec2.h"
 
 namespace Engine{
   class Image {
@@ -42,6 +43,17 @@ namespace Engine{
         imageSurface, nullptr, surface, 
         rect, SDL_SCALEMODE_LINEAR
       );
+    }
+
+    void Render(SDL_Surface* surface, const Vec2& pos) {
+      if (imageSurface) {
+        SDL_Rect rect{
+          int(pos.x), int(pos.y),
+          imageSurface->w, imageSurface->h
+        };
+        SDL_BlitSurface(
+          imageSurface, nullptr, surface, &rect);
+      }
     }
 
 

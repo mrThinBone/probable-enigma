@@ -6,6 +6,9 @@
 #include "Globals.h"
 #include "Engine/Window.h"
 #include "Snake/SnakeUI.h"
+#include "Snake/Assets.h"
+#include "Snake/Cell.h"
+#include "Snake/GameState.h"
 
 int main(int, char**) {
   SDL_Init(SDL_INIT_VIDEO);
@@ -15,7 +18,9 @@ int main(int, char**) {
   Utils::CheckSDLError("Initializing SDL_ttf");
 
   Engine::Window gameWindow{};
-  SnakeUI UI{};
+  Assets assets{};
+  SnakeUI UI{assets};
+  GameState gameState{};
 
   Uint64 previousTick{SDL_GetTicks()};
   Uint64 currentTick;
@@ -30,6 +35,7 @@ int main(int, char**) {
     // events
     while (SDL_PollEvent(&event)) {
       UI.HandleEvent(event);
+      gameState.HandleEvent(event);
       if (event.type == SDL_EVENT_QUIT) {
         IsRunning = false;
       }
@@ -37,6 +43,7 @@ int main(int, char**) {
 
     // Tick
     UI.Tick(deltaTime);
+    gameState.Tick(deltaTime);
 
     // Render
     gameWindow.Render();

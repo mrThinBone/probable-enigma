@@ -1,111 +1,43 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <SDL3_image/SDL_image.h>
-#include <SDL3_ttf/SDL_ttf.h>
-#include <chrono>
-
-#include "Globals.h"
 #include "Engine/Window.h"
-#include "Next/World.h"
-#include "Next/Goblin.h"
-#include "Next/Spawner.h"
+#include "Scene.h"
 
-// download assets at https://www.studyplan.dev/sdl3/sdl3-minesweeper-engine-overview
-using namespace std::chrono;
-
-// Handler
-void HandleKeyboard(const SDL_KeyboardEvent& E) {
-  std::cout
-    << "Key Pressed! Key Code: "
-    << E.key
-    << ", Key Name: "
-    << SDL_GetKeyName(E.key)
-    << '\n';
-
-  if (E.down && E.key == SDLK_SPACE) {
-    std::cout << "\nSpace bar was pressed - " << (E.repeat ? "Repeat" : "Initial");
-  } else if (!E.down && E.key == SDLK_SPACE) {
-    std::cout << "Space bar was released\n";
-  }
-
-  if (E.key == SDLK_UP) {
-    // Up Arrow
-  } else if (E.key == SDLK_DOWN) {
-    // Down Arrow
-  } else if (E.key == SDLK_LEFT) {
-    // Left Arrow
-  } else if (E.key == SDLK_RIGHT) {
-    // Right Arrow
-  }
-}
-
-int main(int, char**){
+int main(int argc, char** argv) {
   SDL_Init(SDL_INIT_VIDEO);
-#ifdef SHOW_DEBUG_HELPERS
-  Utils::CheckSDLError("SDL_Init");
-#endif
-
-  TTF_Init();
-#ifdef SHOW_DEBUG_HELPERS
-  Utils::CheckSDLError("TTF_Init");
-#endif
-
   Engine::Window gameWindow;
+  Scene gameScene;
 
-
-  auto start{high_resolution_clock::now()};
-  
-  Spawner enemySpawner;
-  
-  auto end{high_resolution_clock::now()};
-  duration<double> timeDelta{end - start};
-  std::cout << "TimeDelta: "
-    << timeDelta.count()
-    << " Seconds ("
-    << duration_cast<nanoseconds>(end - start).count()
-    << ')';
-
+  Uint64 lastTick{SDL_GetPerformanceCounter()};
   SDL_Event event;
-  bool shouldQuit{false};
-  Uint64 previousFrame{0};
+  bool isRunning = true;
 
-  while (!shouldQuit) {
-    Uint64 startTimer{SDL_GetPerformanceCounter()};
-
+  while (isRunning) {
     while (SDL_PollEvent(&event)) {
       if (event.type == SDL_EVENT_QUIT) {
-        shouldQuit = true;
-      } else if (event.type == SDL_EVENT_KEY_DOWN) {
-        enemySpawner.HandleKeyDownEvent(event.key);
-        HandleKeyboard(event.key);
+        isRunning = false;
       }
+      gameScene.HandleEvent(event);
     }
 
-    // Update Objects
-    Uint64 thisFrame{SDL_GetTicks()};
-    Uint64 timeDelta2{thisFrame - previousFrame};
-    
-    previousFrame = thisFrame;
+    Uint64 currentTick{SDL_GetPerformanceCounter()};
+    float deltaTime{static_cast<float>(
+      currentTick - lastTick) /
+      static_cast<float>(SDL_GetPerformanceFrequency())
+    };
+    lastTick = currentTick;
 
+    // Tick
+    gameScene.Tick(deltaTime);
 
-    // Render Objects
+    // Render
     gameWindow.Render();
+    gameScene.Render(gameWindow.GetSurface());
 
+    // Swap
     gameWindow.Update();
-
-    // SDL_Delay(1000);
-    Uint64 endTimer{SDL_GetPerformanceCounter()};
-    Uint64 elapsed{endTimer - startTimer};
-    std::cout << "\nElapsed Time: " << elapsed << " ticks";
-    std::cout << SDL_GetPerformanceFrequency();
-    /*
-    A return value of 1,000 would mean it uses milliseconds
-  A return value of 1,000,000 would mean it uses microseconds
-  A return value of 1,000,000,000 would mean it uses nanoseconds
-    */
   }
 
-  TTF_Quit();
   SDL_Quit();
   return 0;
 }
