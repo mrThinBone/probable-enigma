@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include "Vec2.h"
+#include "Engine/Vec2.h"
 #include "Component.h"
 
 class TransformComponent : public Component {

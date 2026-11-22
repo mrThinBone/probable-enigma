@@ -1,7 +1,7 @@
 #include "Component.h"
 #include "Entity.h"
-#include "Scene.h"
+#include "Context.h"
 
 AssetManager& Component::GetAssetManager() const {
-  return owner->GetScene().GetAssetManager();
+  return owner->GetContext().assets;
 }

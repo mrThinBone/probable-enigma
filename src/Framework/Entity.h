@@ -6,19 +6,18 @@
 #include "TransformComponent.h"
 #include "ImageComponent.h"
 #include "Commands.h"
+#include "Context.h"
 
 using ComponentPtr = std::unique_ptr<Component>;
 using ComponentPtrs = std::vector<ComponentPtr>;
 
 using ImageComponents = std::vector<ImageComponent*>;
 
-class Scene;
-
 class Entity {
 public:
-  Entity(Scene& scene) : owningScene{&scene} {}
-  
-  Scene& GetScene() const { return *owningScene; }
+  explicit Entity(Context& context) : context{&context} {}
+
+  Context& GetContext() const { return *context; }
 
   virtual void HandleEvent(const SDL_Event& E) {
     for (ComponentPtr& C : components) {
@@ -136,5 +135,5 @@ public:
 
 private:
   ComponentPtrs components;
-  Scene* owningScene;
+  Context* context;
 };

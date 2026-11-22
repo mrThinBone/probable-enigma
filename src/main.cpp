@@ -1,12 +1,18 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include "Engine/Window.h"
+#include "Framework/AssetManager.h"
+#include "Framework/Context.h"
 #include "Scene.h"
 
 int main(int argc, char** argv) {
   SDL_Init(SDL_INIT_VIDEO);
   Engine::Window gameWindow;
-  Scene gameScene;
+
+  // Services outlive every scene; scenes and entities only borrow them.
+  AssetManager assets;
+  Context context{assets};
+  Scene gameScene{context};
 
   Uint64 lastTick{SDL_GetPerformanceCounter()};
   SDL_Event event;

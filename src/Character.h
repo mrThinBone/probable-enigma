@@ -6,12 +6,12 @@
 
 class Character : public Entity {
  public:
-  Character() {
+  explicit Character(Context& context) : Entity{context} {
     // Automatically add required components
     // upon construction. The AddComponent
     // methods already handle passing 'this'
     transform = AddTransformComponent();
-    image = AddImageComponent();
+    image = AddImageComponent("Assets/sample.bmp");
   }
 
   // Optionally add Character-specific methods here

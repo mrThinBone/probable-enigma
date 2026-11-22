@@ -98,53 +98,24 @@ inline std::ostream& operator<<(std::ostream& stream, const Vec2& v) {
 }
 
 // For Float Comparison
-bool NearlyEqual(float a, float b,
+inline bool NearlyEqual(float a, float b,
                  float tolerance = 0.00001) {
   return std::abs(a - b) < tolerance;
 }
 
 // For Vec2 Comparison
-bool NearlyEqual(const Vec2& a, const Vec2& b,
+inline bool NearlyEqual(const Vec2& a, const Vec2& b,
                  float tolerance = 0.00001) {
   return std::abs(a.x - b.x) < tolerance
     && std::abs(a.y - b.y) < tolerance;
 }
 
 
-SDL_Rect ToSDLRect(const Vec2& pos, int w, int h) {
+inline SDL_Rect ToSDLRect(const Vec2& pos, int w, int h) {
   return {
     static_cast<int>(std::round(pos.x)),
     static_cast<int>(std::round(pos.y)),
     w, h
   };
 }
-
-class Character {
-public:
-  Vec2 position { 2.0, 6.0 };
-  float movementSpeed { 3.0 };
-  
-  void Move(const Vec2& movement) {
-    // If the distance indicated by the Movement vector is shorter 
-    // than the Character's maximum movement speed, 
-    // they will move too far and overshoot the intended destination.
-    // To prevent this, check if we can move immediately.
-    if (movement.GetLength() <= movementSpeed) {
-      position += movement;
-      return;
-    }
-  
-    Vec2 direction{movement.Normalize()};
-    Vec2 constrainedMovement{direction * movementSpeed};
-    position += constrainedMovement;
-  }
-
-  void MoveTowards(const Character& target) {
-    Move(target.position - position);
-  }
-
-  void MoveAway(const Character& target) {
-    Move(position - target.position);
-  }
-};
 

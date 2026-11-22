@@ -4,7 +4,6 @@
 // Forward declaration to avoid circular includes
 class Entity;
 class AssetManager;
-class Scene;
 
 class Component {
 public:

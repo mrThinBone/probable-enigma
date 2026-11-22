@@ -2,7 +2,7 @@
 #include <SDL3/SDL.h>
 #include <vector>
 #include "Framework/Entity.h"
-#include "Framework/AssetManager.h" 
+#include "Framework/Context.h"
 #include "Character.h"
 
 
@@ -11,13 +11,13 @@ using EntityPtrs = std::vector<EntityPtr>;
 
 class Scene {
 public:
-    Scene() {
+  explicit Scene(Context& context) : context{context} {
     // Create a Character instead of a generic Entity
     // The Character constructor handles adding
     // its default components
-    EntityPtr& newCharacter{entities.emplace_back(
-      std::make_unique<Character>()
-    )};
+    entities.emplace_back(
+      std::make_unique<Character>(context)
+    );
   }
 
   void HandleEvent(const SDL_Event& E) {
@@ -38,11 +38,7 @@ public:
     }
   }
 
-  AssetManager& GetAssetManager() {
-    return assets;
-  }
-
 private:
+  Context& context;
   EntityPtrs entities;
-  AssetManager assets;
 };
