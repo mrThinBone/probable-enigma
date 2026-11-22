@@ -1,16 +1,31 @@
 #pragma once
-#include <iostream>
+#include <string>
+#include <SDL3/SDL.h>
 #include "Component.h"
 
 class ImageComponent : public Component {
-public:
-  // Inherit the constructor from the base class
+ public:
   using Component::Component;
+  ImageComponent(
+    Entity* owner,
+    const std::string& filePath
+  );
 
-  // ImageComponent() {
-  //   std::cout << "ImageComponent created\n";
-  // }
+  // Copy Semantics
+  ImageComponent(const ImageComponent& other);
+  ImageComponent& operator=(const ImageComponent& other);
 
-  void Initialize() override; 
+  // Move Semantics
+  ImageComponent(ImageComponent&& other) noexcept;
+  ImageComponent& operator=(ImageComponent&& other) noexcept;
+
+  ~ImageComponent() override;
+
+  void Initialize() override;
   void Render(SDL_Surface* surface) override;
+
+private:
+  SDL_Surface* imageSurface{nullptr};
+  std::string imageFilePath;
+  void LoadSurfaceInternal();
 };
