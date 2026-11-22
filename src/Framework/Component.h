@@ -3,6 +3,8 @@
 
 // Forward declaration to avoid circular includes
 class Entity;
+class AssetManager;
+class Scene;
 
 class Component {
 public:
@@ -15,6 +17,8 @@ public:
   virtual void Tick(float deltaTime) {}
   virtual void Render(SDL_Surface* surface) {}
   virtual ~Component() = default;
+
+  AssetManager& GetAssetManager() const;
 
   virtual void OnComponentRemoved(Component* c) {}
 

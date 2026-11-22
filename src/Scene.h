@@ -2,7 +2,9 @@
 #include <SDL3/SDL.h>
 #include <vector>
 #include "Framework/Entity.h"
+#include "Framework/AssetManager.h" 
 #include "Character.h"
+
 
 using EntityPtr = std::unique_ptr<Entity>;
 using EntityPtrs = std::vector<EntityPtr>;
@@ -36,6 +38,11 @@ public:
     }
   }
 
+  AssetManager& GetAssetManager() {
+    return assets;
+  }
+
 private:
   EntityPtrs entities;
+  AssetManager assets;
 };

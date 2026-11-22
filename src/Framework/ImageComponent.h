@@ -10,6 +10,8 @@ class ImageComponent : public Component {
     Entity* owner,
     const std::string& filePath
   );
+/*
+  No custom destructor, copy/move ops needed!
 
   // Copy Semantics
   ImageComponent(const ImageComponent& other);
@@ -20,12 +22,18 @@ class ImageComponent : public Component {
   ImageComponent& operator=(ImageComponent&& other) noexcept;
 
   ~ImageComponent() override;
-
+*/
   void Initialize() override;
   void Render(SDL_Surface* surface) override;
 
+  bool LoadNewImage(const std::string& newPath);
+
 private:
-  SDL_Surface* imageSurface{nullptr};
+  // SDL_Surface* imageSurface{nullptr};
+
+  std::shared_ptr<SDL_Surface> imageSurface{nullptr};
   std::string imageFilePath;
-  void LoadSurfaceInternal();
+
+  // We don't need this any more, either
+  // void LoadSurfaceInternal();
 };

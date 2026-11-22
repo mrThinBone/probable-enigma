@@ -5,14 +5,21 @@
 #include "Component.h"
 #include "TransformComponent.h"
 #include "ImageComponent.h"
+#include "Commands.h"
 
 using ComponentPtr = std::unique_ptr<Component>;
 using ComponentPtrs = std::vector<ComponentPtr>;
 
 using ImageComponents = std::vector<ImageComponent*>;
 
+class Scene;
+
 class Entity {
- public:
+public:
+  Entity(Scene& scene) : owningScene{&scene} {}
+  
+  Scene& GetScene() const { return *owningScene; }
+
   virtual void HandleEvent(const SDL_Event& E) {
     for (ComponentPtr& C : components) {
       C->HandleEvent(E);
@@ -76,10 +83,10 @@ class Entity {
     return nullptr;
   }
 
-  ImageComponent* AddImageComponent() {
+  ImageComponent* AddImageComponent(const std::string& filePath) {
     ComponentPtr& newComponent{
       components.emplace_back(
-        std::make_unique<ImageComponent>(this)
+        std::make_unique<ImageComponent>(this, filePath)
       )
     };
 
@@ -129,4 +136,5 @@ class Entity {
 
 private:
   ComponentPtrs components;
+  Scene* owningScene;
 };
