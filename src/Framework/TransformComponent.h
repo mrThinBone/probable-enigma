@@ -19,6 +19,10 @@ public:
     return position;
   }
 
+  void Move(const Vec2& movement) {
+    position += movement;
+  }
+
 private:
   Vec2 position{0, 0};
 };

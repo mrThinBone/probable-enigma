@@ -33,6 +33,10 @@ class Entity {
 
   virtual ~Entity() = default;
 
+  virtual void HandleCommand(std::unique_ptr<Command> cmd) {
+    cmd->Execute(this);
+  }
+
   TransformComponent* AddTransformComponent() {
     if (GetTransformComponent()) {
       std::cout << "Error: Cannot have "
