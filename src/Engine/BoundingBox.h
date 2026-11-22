@@ -46,6 +46,26 @@ public:
     SDL_FillSurfaceRect(surface, &right, lineColor);
   }
 
+  bool GetIntersection(const BoundingBox& other,SDL_FRect* intersection) {
+    if (!intersection) return false;
+
+    SDL_FRect b{other.GetRect()};
+
+    if (!SDL_GetRectIntersectionFloat(&rect, &b, intersection)) {
+      return false;
+    }
+
+    if (SDL_RectEmptyFloat(intersection)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  SDL_FRect GetRect() const {
+    return rect;
+  }
+
 private:
   SDL_FRect rect;
 };

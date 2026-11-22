@@ -6,6 +6,10 @@
 #include "Scene.h"
 #include "Config.h"
 
+enum class GameObjectType {
+  GameObject, Player, Projectile, Floor
+};
+
 class Scene;
 
 class GameObject {
@@ -15,14 +19,16 @@ public:
     const Vec2& initialPosition,
     const Scene& scene,
     float width,
-    float height
+    float height,
+    bool isMovable = false
   ) :                     image{imagePath},
                           position{initialPosition},
                           scene{scene},
                           bounds{ SDL_FRect{
                             initialPosition.x, initialPosition.y,
                             width, height
-                          } } {}
+                          } },
+                          isMovable{isMovable} {}
 
   void HandleEvent(SDL_Event& event) {}
   void Tick(float deltaTime) {}
@@ -59,11 +65,32 @@ public:
       maxMagnitude, stoppingMagnitude);
   }
 
+  const Vec2& GetPosition() const {
+    return position;
+  }
+
+
+  virtual GameObjectType GetType() {
+    return GameObjectType::GameObject;
+  }
+  virtual std::string GetTypeName() {
+    return "GameObject";
+  }
+  bool HasType(GameObjectType TargetType) {
+    return GetType() == TargetType;
+  }
+  virtual bool CanPassThrough() { return true; };
+  virtual void OnHit(GameObject& Target) {}
+  virtual ~GameObject() = default;
+
 private:
   Engine::Image image;
   const Scene& scene;
   BoundingBox bounds;
   float mass{50.0f};
+
+  bool isMovable;
+  bool isOnGround = true;
   
   float forceTimeRemaining{5.0f};
 
@@ -109,5 +136,50 @@ private:
   void ApplyPositionalImpulse(const Vec2& origin, float magnitude) {
     Vec2 direction{(position - origin).Normalize()};
     ApplyImpulse(direction * magnitude);
+  }
+
+  void CalculateAnimation();
+
+  void HandleCollisions();
+};
+
+#define GAME_OBJECT_TYPE(TypeName)     \ 
+  GameObjectType GetType() override {  \ 
+    return GameObjectType::TypeName;   \ 
+  }                                    \ 
+                                       \ 
+  std::string GetTypeName() override { \ 
+    return #TypeName;                  \ 
+  }                                    \ 
+
+class Player : public GameObject {
+public:
+  using GameObject::GameObject;
+  GAME_OBJECT_TYPE(Player)
+
+  void TakeDamage(int Damage) {
+    Health -= Damage;
+  }
+
+  int Health{100};
+};
+
+class Floor : public GameObject {
+public:
+  using GameObject::GameObject;
+  GAME_OBJECT_TYPE(Floor)
+
+  bool CanPassThrough() override { return false; }
+};
+
+class Projectile : public GameObject {
+public:
+  using GameObject::GameObject;
+  GAME_OBJECT_TYPE(Projectile)
+
+  void OnHit(GameObject& Target) override {
+    if (Player* P{dynamic_cast<Player*>(&Target)}) {
+      P->TakeDamage(10);
+    }
   }
 };

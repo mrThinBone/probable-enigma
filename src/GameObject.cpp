@@ -20,13 +20,43 @@ void GameObject::HandleEvent(SDL_Event& event) {
 }
 
 void GameObject::Render(SDL_Surface* surface) {
+
+    // if (!IsInViewport()) return;
+
     image.Render(surface, position);
 #ifdef DRAW_DEBUG_HELPERS
+    // SDL_Rect positionIndicator{
+    //     int(position.x) - 10, int(position.y) - 10, 20, 20};
+
+    // SDL_FillSurfaceRect(
+    //     trajectories,
+    //     &positionIndicator,
+    //     SDL_MapRGB(
+    //     SDL_GetPixelFormatDetails(trajectories->format),
+    //     nullptr, 220, 0, 0
+    //     )
+    // );
+
+    // SDL_BlitSurface(
+    //     trajectories, nullptr,
+    //     surface, nullptr);
+
     bounds.Render(surface);
 #endif
 }
 
 void GameObject::Tick(float deltaTime) {
+    if (!isMovable) return;
+
+    CalculateAnimation();
+
+    if (scene.GetPlayerCharacter().GetPosition().GetDistance(position) > 20.0f * PIXELS_PER_METER) {
+        std::cout << "Skipping Physics\n";
+        return;
+    }
+    std::cout << "Calculating Physics\n";
+
+    // Run physics calculations...
 
     ApplyForce(GetFrictionForce(deltaTime));
     ApplyForce(GetDragForce());
@@ -52,7 +82,9 @@ void GameObject::Tick(float deltaTime) {
 
     Clamp(velocity);
 
-    bounds.SetPosition(position); 
+    bounds.SetPosition(position);
+
+    HandleCollisions();
 
     std::cout << "\nt = " << time
         << ", Position = " << position;
@@ -72,4 +104,41 @@ void GameObject::ApplyForce(const Vec2& force) {
     // if 10N of force is applied to an object of mass 5kg, 
     // that object should be accelerated by 10/5 = 2m/s
     acceleration += force / mass;
+}
+
+void GameObject::CalculateAnimation() {
+    SDL_Rect boundingBoxRect{BoundingBox::Round(
+        bounds.GetRect()
+    )};
+    
+    SDL_Rect viewportRect{scene.GetViewport()};
+
+    if (!SDL_HasRectIntersection(&viewportRect, &boundingBoxRect)) {
+        std::cout << "Not visible - skipping\n";
+        return;
+    }
+
+    std::cout << "Calculating animation\n";
+    // ....
+}
+
+void GameObject::HandleCollisions() {
+    isOnGround = false;
+    for (const GameObjectPtr& object : scene.GetObjects()) {
+        if (object.get() == this) continue;
+
+        SDL_FRect intersection;
+        if (bounds.GetIntersection(object->bounds, &intersection)) {
+            object->OnHit(*this);
+            if (object->CanPassThrough()) {
+                continue;
+            }
+
+            if (object->HasType(GameObjectType::Floor)) {
+                isOnGround = true;
+                position.y -= intersection.h;
+                velocity.y = 0;
+            }
+        }
+    }
 }
