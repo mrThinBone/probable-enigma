@@ -25,16 +25,20 @@ public:
     }
   }
 
-  virtual void Tick(float DeltaTime) {
+  virtual void Tick(float deltaTime) {
     for (ComponentPtr& C : components) {
-      C->Tick(DeltaTime);
+      C->Tick(deltaTime);
     }
   }
 
-  virtual void Render(SDL_Surface* Surface) {
+  virtual void Render(SDL_Surface* surface) {
     for (ComponentPtr& C : components) {
-      C->Render(Surface);
+      C->Render(surface);
+#ifdef DRAW_DEBUG_HELPERS
+      C->DrawDebugHelpers(surface);
+#endif
     }
+
   }
 
   virtual ~Entity() = default;

@@ -16,6 +16,9 @@ public:
   virtual void Tick(float deltaTime) {}
   virtual void Render(SDL_Surface* surface) {}
   virtual ~Component() = default;
+  virtual void DrawDebugHelpers(SDL_Surface* Surface) {}
+
+  Context& GetContext() const;
 
   AssetManager& GetAssetManager() const;
 
@@ -25,6 +28,8 @@ public:
   Entity* GetOwner() const { 
     return owner;
   }
+
+  Vec2 GetOwnerPosition() const;
 
 private:
   // Store a pointer to the owner

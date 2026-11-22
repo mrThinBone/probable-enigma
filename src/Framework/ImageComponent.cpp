@@ -26,15 +26,18 @@ ImageComponent::ImageComponent(
 void ImageComponent::Render(SDL_Surface* surface) {
   if (!imageSurface) return;
 
-  TransformComponent* transform{ GetOwner()->GetTransformComponent() };
+  //TransformComponent* transform{ GetOwner()->GetTransformComponent() };
+  auto [x, y] { GetOwnerPosition() + offset };
 
-  if (transform) {
-    std::cout << "ImageComponent (" << imageFilePath << 
-              ") ready to render at: " << transform->GetPosition() << '\n';
-  } else {
-    std::cout << "ImageComponent ("
-      << imageFilePath
-      << ") ready, but no TransformComponent found\n";
+  SDL_Rect destination{ Utilities::Round({x, y, 0, 0}) };
+
+  if (!SDL_BlitSurface(
+    imageSurface.get(),
+    nullptr,
+    surface,
+    &destination
+  )) {
+    std::cerr << "Error: Blit failed: " << SDL_GetError() << '\n';
   }
 }
 
@@ -62,6 +65,36 @@ bool ImageComponent::LoadNewImage(const std::string& newPath) {
   return imageSurface != nullptr;
 }
 
+void ImageComponent::DrawDebugHelpers(SDL_Surface* surface){
+  if (!imageSurface) return;
+
+  auto [x, y] { GetOwnerPosition() + offset };
+
+  SDL_Rect debugRect{Utilities::Round({
+      x - 5, y - 5, 10, 10 })};
+
+  SDL_FillSurfaceRect(surface, &debugRect, SDL_MapRGB(
+    SDL_GetPixelFormatDetails(surface->format),
+    nullptr, 0, 0, 255));
+}
+
+int ImageComponent::GetSurfaceWidth() const {
+  if (!imageSurface) {
+    std::cerr << "Warning: Attempted to get "
+      "width from null ImageSurface.\n";
+    return 0;
+  }
+  return imageSurface->w;
+}
+
+int ImageComponent::GetSurfaceHeight() const {
+  if (!imageSurface) {
+    std::cerr << "Warning: Attempted to get "
+      "height from null ImageSurface.\n";
+    return 0;
+  }
+  return imageSurface->h;
+}
 
 /*
 ImageComponent::~ImageComponent() {
