@@ -9,13 +9,29 @@ public:
   virtual ~Command() = default;
 };
 
-class MovementCommand : public Command {
+class StaticMovementCommand : public Command {
 public:
-  MovementCommand(Vec2 movement): movement{movement} {}
+  StaticMovementCommand(Vec2 movement): movement{movement} {}
   void Execute(Entity* T) override;
 
   void Undo();
   
   Vec2 movement;
   Entity* target;
+};
+
+class MovementCommand : public Command {
+public:
+  MovementCommand(Vec2 velocity): velocity{velocity} {}
+  void Execute(Entity* T) override;
+
+  Vec2 velocity;
+  Entity* target;
+};
+
+class JumpCommand : public Command {
+ public:
+  JumpCommand(Vec2 impulse) : impulse(impulse) {}
+  void Execute(Entity* target) override;
+  Vec2 impulse;
 };

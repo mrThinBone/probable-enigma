@@ -7,6 +7,7 @@
 #include "ImageComponent.h"
 #include "Commands.h"
 #include "Context.h"
+#include "PhysicsComponent.h"
 
 using ComponentPtr = std::unique_ptr<Component>;
 using ComponentPtrs = std::vector<ComponentPtr>;
@@ -113,6 +114,34 @@ public:
       }
     }
     return result;
+  }
+
+  PhysicsComponent* AddPhysicsComponent() {
+    if (GetPhysicsComponent()) {
+      std::cerr << "Error: Cannot add multiple "
+        "PhysicsComponents to an Entity.\n";
+      return nullptr;
+    }
+
+    ComponentPtr& newComponent{
+      components.emplace_back(
+        std::make_unique<PhysicsComponent>(this)
+      )
+    };
+
+    newComponent->Initialize();
+    return static_cast<PhysicsComponent*>(
+      newComponent.get()
+    );
+  }
+
+  PhysicsComponent* GetPhysicsComponent() const {
+    for (const ComponentPtr& C : components) {
+      if (auto ptr{ dynamic_cast<PhysicsComponent*>(C.get()) }) {
+        return ptr;
+      }
+    }
+    return nullptr;
   }
 
   void RemoveComponent(Component* PtrToRemove) {

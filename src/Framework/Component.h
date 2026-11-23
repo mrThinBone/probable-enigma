@@ -31,6 +31,8 @@ public:
 
   Vec2 GetOwnerPosition() const;
 
+  void SetOwnerPosition(const Vec2& pos) const;
+
   float GetOwnerScale() const;
 
 private:
