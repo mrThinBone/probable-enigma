@@ -30,15 +30,33 @@ public:
     for (EntityPtr& entity : entities) {
       entity->Tick(DeltaTime);
     }
+
+    CheckCollisions();
   }
 
-  void Render(SDL_Surface* Surface) {
+  void Render(SDL_Surface* surface) {
     for (EntityPtr& entity : entities) {
-      entity->Render(Surface);
+      entity->Render(surface);
     }
+#ifdef DRAW_DEBUG_HELPERS
+    SDL_BlitSurface(
+      trajectories, nullptr, surface, nullptr
+    );
+#endif
   }
+
+#ifdef DRAW_DEBUG_HELPERS
+  SDL_Surface* trajectories{
+    SDL_CreateSurface(
+      700, 300,
+      SDL_PIXELFORMAT_RGBA32
+    )
+  };
+#endif
 
 private:
   Context& context;
   EntityPtrs entities;
+
+  void CheckCollisions();
 };

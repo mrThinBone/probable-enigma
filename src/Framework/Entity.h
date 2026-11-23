@@ -8,6 +8,7 @@
 #include "Commands.h"
 #include "Context.h"
 #include "PhysicsComponent.h"
+#include "CollisionComponent.h"
 
 using ComponentPtr = std::unique_ptr<Component>;
 using ComponentPtrs = std::vector<ComponentPtr>;
@@ -47,6 +48,9 @@ public:
   virtual void HandleCommand(std::unique_ptr<Command> cmd) {
     cmd->Execute(this);
   }
+
+  // Called when this entity collides with 'Other'
+  virtual void HandleCollision(Entity& other) {} 
 
   TransformComponent* AddTransformComponent() {
     if (GetTransformComponent()) {
@@ -138,6 +142,23 @@ public:
   PhysicsComponent* GetPhysicsComponent() const {
     for (const ComponentPtr& C : components) {
       if (auto ptr{ dynamic_cast<PhysicsComponent*>(C.get()) }) {
+        return ptr;
+      }
+    }
+    return nullptr;
+  }
+
+  CollisionComponent* AddCollisionComponent() {
+    ComponentPtr& newComponent{ components.emplace_back(std::make_unique<CollisionComponent>(this)) };
+    newComponent->Initialize();
+    return static_cast<CollisionComponent*>(
+      newComponent.get()
+    );
+  }
+
+  CollisionComponent* GetCollisionComponent() const {
+    for (const ComponentPtr& C : components) {
+      if (auto ptr{ dynamic_cast<CollisionComponent*>(C.get()) }) {
         return ptr;
       }
     }
