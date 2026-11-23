@@ -3,7 +3,94 @@
 #include "ImageComponent.h"
 #include "Entity.h"
 #include "TransformComponent.h"
-#include "AssetManager.h" 
+#include "AssetManager.h"
+#include "Utilities.h"
+
+/*
+The core idea for implementing our scaling modes will be calculating the correct srcrect and dstrect based on the ScaleMode, 
+the image dimensions, and the target Width/Height.
+
+https://www.studyplan.dev/sdl3/sdl3-entity-scaling#scaling-modes
+*/
+namespace {
+  struct BlitInfo {
+    SDL_Rect sourceRect;
+    SDL_Rect destRect;
+  };
+
+  // Helper function to calculate source and
+  // destination rectangles
+  BlitInfo CalculateBlitInfo(
+    ScalingMode mode,
+    // Natural surface dimensions
+    int surfaceW, int surfaceH,
+    // Target top-left screen position
+    float targetX,  float targetY,
+    // Target rendering dimensions
+    float targetW, float targetH
+  ) {
+    BlitInfo info;
+
+    // Default to rendering the whole image
+    info.sourceRect = {0, 0, surfaceW, surfaceH};
+
+    if (mode == ScalingMode::Cover) {
+      float scale{ std::max(targetW/surfaceW, targetH/surfaceH) };
+
+      if (scale * surfaceW > targetW) {
+        float clipW { targetW / scale };
+        info.sourceRect = Utilities::Round({
+          0, 0,
+          clipW,
+          static_cast<float>(surfaceH)
+        });
+
+      } else if (scale * surfaceH > targetH) {
+        float clipH { targetH / scale };
+        info.sourceRect = Utilities::Round({
+          0, 0,
+          static_cast<float>(surfaceW),
+          clipH
+        });
+      }
+      
+      info.destRect = Utilities::Round({ targetX, targetY, targetW, targetH });
+
+      return info;
+    }
+
+    if (mode == ScalingMode::Fill) {
+      // Stretch source to fill the exact target dimensions
+      info.destRect = Utilities::Round({
+        targetX, targetY, targetW, targetH
+      });
+      return info;
+    }
+
+    if (mode == ScalingMode::Contain) {
+      float scale{ std::min(targetW/surfaceW, targetH/surfaceH) };
+
+      info.destRect = Utilities::Round({
+        targetX, targetY,
+        surfaceW * scale,
+        surfaceH * scale
+      });
+
+      return info;
+    }
+
+    // default: mode == ScalingMode::None
+    // Render at natural image size and at the target position
+    info.destRect = Utilities::Round({
+      targetX,
+      targetY,
+      static_cast<float>(surfaceW),
+      static_cast<float>(surfaceH)
+    });
+
+    return info;
+  }
+}
 
 ImageComponent::ImageComponent(
   Entity* owner,
@@ -27,15 +114,28 @@ void ImageComponent::Render(SDL_Surface* surface) {
   if (!imageSurface) return;
 
   //TransformComponent* transform{ GetOwner()->GetTransformComponent() };
-  auto [x, y] { GetOwnerPosition() + offset };
+  auto [targetX, targetY] { GetOwnerPosition() + offset };
+  float targetW { GetWidth() * GetOwnerScale() };
+  float targetH { GetHeight() * GetOwnerScale() };
 
-  SDL_Rect destination{ Utilities::Round({x, y, 0, 0}) };
+  int surfaceW { GetSurfaceWidth() };
+  int surfaceH { GetSurfaceHeight() };
 
-  if (!SDL_BlitSurface(
+  BlitInfo info { 
+    CalculateBlitInfo(
+      scaleMode,
+      surfaceW, surfaceH,
+      targetX, targetY,
+      targetW, targetH
+    ) 
+  };
+
+  if (!SDL_BlitSurfaceScaled(
     imageSurface.get(),
-    nullptr,
+    &info.sourceRect,
     surface,
-    &destination
+    &info.destRect,
+    SDL_SCALEMODE_LINEAR
   )) {
     std::cerr << "Error: Blit failed: " << SDL_GetError() << '\n';
   }
@@ -65,13 +165,57 @@ bool ImageComponent::LoadNewImage(const std::string& newPath) {
   return imageSurface != nullptr;
 }
 
-void ImageComponent::DrawDebugHelpers(SDL_Surface* surface){
+void ImageComponent::DrawDebugHelpers(SDL_Surface* surface) {
   if (!imageSurface) return;
 
-  auto [x, y] { GetOwnerPosition() + offset };
+  // Gather our position and dimensions for
+  // the CalculateBlitInfo() function,
+  // similar to what we did in Render()
+  auto [targetX, targetY]{
+    GetOwnerPosition() + offset
+  };
+  float ownerScale{ GetOwnerScale() };
+  float targetW{ GetWidth() * ownerScale };
+  float targetH{ GetHeight() * ownerScale };
+  int surfaceW{ GetSurfaceWidth() };
+  int surfaceH{ GetSurfaceHeight() };
 
+  // 1. Draw Natural Bounds (Green Outline)
+  SDL_Rect naturalBounds{
+    Utilities::Round({
+      targetX, targetY,
+      surfaceW * ownerScale,
+      surfaceH * ownerScale
+    })};
+
+  Utilities::DrawRectOutline(
+    surface, naturalBounds,
+    SDL_MapRGB(
+      SDL_GetPixelFormatDetails(surface->format),
+      nullptr, 0, 255, 0
+    )
+  );
+
+  // 2. Draw Rendered Bounds (Red Outline)
+  BlitInfo info{CalculateBlitInfo(
+    scaleMode,
+    surfaceW, surfaceH,
+    targetX, targetY,
+    targetW, targetH
+  )};
+
+  Utilities::DrawRectOutline(
+    surface, info.destRect,
+    SDL_MapRGB(
+      SDL_GetPixelFormatDetails(surface->format),
+      nullptr, 255, 0, 0
+    )
+  );
+
+  // Continue to draw the position
+  // marker from before (Blue Square)
   SDL_Rect debugRect{Utilities::Round({
-      x - 5, y - 5, 10, 10 })};
+      targetX - 5, targetY - 5, 10, 10 })};
 
   SDL_FillSurfaceRect(surface, &debugRect, SDL_MapRGB(
     SDL_GetPixelFormatDetails(surface->format),
@@ -94,6 +238,38 @@ int ImageComponent::GetSurfaceHeight() const {
     return 0;
   }
   return imageSurface->h;
+}
+
+void ImageComponent::SetWidth(float newWidth) {
+  width = newWidth;
+}
+
+void ImageComponent::SetHeight(float newHeight) {
+  height = newHeight;
+}
+
+void ImageComponent::ResetWidth() {
+  width = std::nullopt;
+}
+
+void ImageComponent::ResetHeight() {
+  height = std::nullopt;
+}
+
+float ImageComponent::GetWidth() const {
+  // If Width has a value, return it.
+  // Otherwise, return surface width.
+  return width.value_or(GetSurfaceWidth());
+}
+
+float ImageComponent::GetHeight() const {
+  // If Height has a value, return it.
+  // Otherwise, return surface height.
+  return height.value_or(GetSurfaceHeight());
+}
+
+void ImageComponent::SetScalingMode(ScalingMode mode) {
+  scaleMode = mode;
 }
 
 /*

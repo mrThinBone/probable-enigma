@@ -29,6 +29,12 @@ public:
     position += movement;
   }
 
+  float GetScale() const { return scale; }
+  
+  void SetScale(float newScale) {
+    scale = newScale;
+  }
+
   void DrawDebugHelpers(SDL_Surface* surface) override {
     auto [x, y] { GetPosition() };
     SDL_Rect square{Utilities::Round({
@@ -41,4 +47,5 @@ public:
 
 private:
   Vec2 position{0, 0};
+  float scale{1.0};
 };

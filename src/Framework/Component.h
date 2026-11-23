@@ -31,6 +31,8 @@ public:
 
   Vec2 GetOwnerPosition() const;
 
+  float GetOwnerScale() const;
+
 private:
   // Store a pointer to the owner
   Entity* owner{nullptr};
