@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <cassert>
+#include "Sprite.h"
 
 // const char* RESOURCES_DIR = "Assets";
 
@@ -9,7 +10,7 @@
 struct SDLApplication {
     SDL_Window* window;
     SDL_Renderer* renderer;
-    SDL_Texture* mTexture;
+    Sprite* mSprite;
 
     bool mRunning = false;
 
@@ -35,27 +36,23 @@ struct SDLApplication {
             // https://youtu.be/5CiO035hQNA?si=6C2xTiBNH5f40zHa&t=276
             SDL_SetRenderLogicalPresentation(renderer, 640, 480, SDL_LOGICAL_PRESENTATION_STRETCH);
 
-            const char* basePath = SDL_GetBasePath();
-            std::string assetFolder = std::string(basePath) + "Assets/";
-            SDL_Surface* surface = SDL_LoadBMP((std::string(basePath) + "Assets/sample.bmp").c_str());
-            if (surface == nullptr) {
-                std::cerr << "Failed to load BMP: " << SDL_GetError() << std::endl;
-                assert(0 && "Not able to load BMP");
-            } else {
-                mTexture = SDL_CreateTextureFromSurface(renderer, surface);
-                SDL_DestroySurface(surface);
-            }
+            SetupSceneData();
         }
+    }
+
+    void SetupSceneData() {
+        const char* basePath = SDL_GetBasePath();
+        std::string assetFolder = std::string(basePath) + "Assets/";
+        SDL_FRect spriteRect = { 0, 0, 640, 480 };
+        // SDL_FRect spriteRect = { 0, 0, 400, 280 };
+        mSprite = new Sprite(renderer, std::string(assetFolder) + "sample.bmp", spriteRect);
     }
 
     // Destructor
     ~SDLApplication() {
-        if (mTexture != nullptr)
-        SDL_DestroyTexture(mTexture);
-        if (renderer != nullptr)
-        SDL_DestroyRenderer(renderer);
-        if (window != nullptr)
-        SDL_DestroyWindow(window);
+        if (mSprite != nullptr) delete mSprite;
+        if (renderer != nullptr) SDL_DestroyRenderer(renderer);
+        if (window != nullptr) SDL_DestroyWindow(window);
         SDL_Quit();
     }
 
@@ -119,12 +116,7 @@ struct SDLApplication {
         SDL_RenderClear(renderer);
         
         // draw operation in between
-        SDL_RenderTexture(
-            renderer,
-            mTexture,
-            nullptr, // portion of texture to draw
-            nullptr // portion of window to draw
-        );
+        mSprite->Render(renderer);
 
         // update
         SDL_RenderPresent(renderer);
