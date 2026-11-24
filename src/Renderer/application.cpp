@@ -3,15 +3,15 @@
 #include <string>
 #include <cassert>
 
+// const char* RESOURCES_DIR = "Assets";
+
 // https://wiki.libsdl.org/SDL3/CategoryRender
 struct SDLApplication {
     SDL_Window* window;
     SDL_Renderer* renderer;
+    SDL_Texture* mTexture;
 
     bool mRunning = false;
-
-    // A test surface to play with
-    SDL_Surface* mSurface;
 
     // Constructor
     SDLApplication(const char* title) {
@@ -34,11 +34,27 @@ struct SDLApplication {
             // modes: https://wiki.libsdl.org/SDL3/SDL_RendererLogicalPresentation
             // https://youtu.be/5CiO035hQNA?si=6C2xTiBNH5f40zHa&t=276
             SDL_SetRenderLogicalPresentation(renderer, 640, 480, SDL_LOGICAL_PRESENTATION_STRETCH);
+
+            const char* basePath = SDL_GetBasePath();
+            std::string assetFolder = std::string(basePath) + "Assets/";
+            SDL_Surface* surface = SDL_LoadBMP((std::string(basePath) + "Assets/sample.bmp").c_str());
+            if (surface == nullptr) {
+                std::cerr << "Failed to load BMP: " << SDL_GetError() << std::endl;
+                assert(0 && "Not able to load BMP");
+            } else {
+                mTexture = SDL_CreateTextureFromSurface(renderer, surface);
+                SDL_DestroySurface(surface);
+            }
         }
     }
 
     // Destructor
     ~SDLApplication() {
+        if (mTexture != nullptr)
+        SDL_DestroyTexture(mTexture);
+        if (renderer != nullptr)
+        SDL_DestroyRenderer(renderer);
+        if (window != nullptr)
         SDL_DestroyWindow(window);
         SDL_Quit();
     }
@@ -91,8 +107,8 @@ struct SDLApplication {
     void Update() {}
 
     void Render() {
-        /*SDL_Surface* windowSurface = SDL_GetWindowSurface(window);
-        const SDL_PixelFormatDetails *Fmt = SDL_GetPixelFormatDetails(windowSurface->format);
+        SDL_Surface* windowSurface = SDL_GetWindowSurface(window);
+        /*const SDL_PixelFormatDetails *Fmt = SDL_GetPixelFormatDetails(windowSurface->format);
         if (windowSurface != nullptr) {
             SDL_FillSurfaceRect(windowSurface, NULL, SDL_MapRGB(Fmt, nullptr, 0, 0, 0));
             SDL_UpdateWindowSurface(window);
@@ -103,6 +119,12 @@ struct SDLApplication {
         SDL_RenderClear(renderer);
         
         // draw operation in between
+        SDL_RenderTexture(
+            renderer,
+            mTexture,
+            nullptr, // portion of texture to draw
+            nullptr // portion of window to draw
+        );
 
         // update
         SDL_RenderPresent(renderer);

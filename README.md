@@ -40,3 +40,12 @@ https://www.youtube.com/live/UFuWGECc8w0?si=Ab0KW_0sO59RQ9xu
 
     
 
+Texture Architecture
+https://youtu.be/r8T-SPCz4JM?si=erYaXRLR_i9_qj65
+
+
+Reference:   
+https://wiki.libsdl.org/SDL3/CategoryRender
+https://wiki.libsdl.org/SDL3/APIByCategory   
+   
+https://www.youtube.com/watch?v=ZJFvYRYpQ1w
