@@ -10,7 +10,7 @@ public:
         SDL_Surface* surface = SDL_LoadBMP(imagePath.c_str());
         // vecteezy walk sprites
         // 1920x1280
-        // 320x640
+        // each = 640x640
         if (surface == nullptr) {
             std::cerr << "Failed to load BMP: " << SDL_GetError() << std::endl;
             assert(0 && "Not able to load BMP");
@@ -18,6 +18,11 @@ public:
         m_srcRect = SDL_FRect {0, 0, 640, 640}; // srcrect
         m_totalXFrame = 3;
         m_totalYFrame = 2;
+
+        m_centerPoint = SDL_FPoint {
+            .x = m_srcRect.w / 2,
+            .y = m_srcRect.h / 2
+        };
 
         const SDL_PixelFormatDetails *pfd = SDL_GetPixelFormatDetails(surface->format);
         Uint32 colorKey = SDL_MapRGB(pfd, nullptr, 0xFF, 0xFF, 0xFF); // white color key
@@ -54,11 +59,20 @@ public:
     void Render(SDL_Renderer* renderer) {
         if (mTexture == nullptr) return;
 
-        SDL_RenderTexture(
+        /*SDL_RenderTexture(
             renderer,
             mTexture,
             &m_srcRect, // portion of texture to draw
             &m_dstRect // portion of window to draw
+        );*/
+        SDL_RenderTextureRotated(
+            renderer,
+            mTexture,
+            &m_srcRect, // portion of texture to draw
+            &m_dstRect, // portion of window to draw
+            0.0, // angle
+            &m_centerPoint, // center point: imporant for angle
+            faceFront ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL // flip
         );
     }
 
@@ -94,13 +108,21 @@ public:
         m_srcRect.y = static_cast<float>(m_yFrameIndex * m_srcRect.h);
     }
 
+    void Turn() {
+        faceFront = !faceFront;
+    }
+
 private:
     SDL_Texture* mTexture;
     SDL_FRect m_dstRect;
+    
     SDL_FRect m_srcRect;
     int m_xFrameIndex = 0;
     int m_yFrameIndex = 0;
     int m_totalXFrame;
     int m_totalYFrame;
     Uint64 elapsedTime = 0;
+
+    SDL_FPoint m_centerPoint;
+    bool faceFront = true;
 };

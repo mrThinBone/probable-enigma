@@ -73,9 +73,9 @@ struct SDLApplication {
                     case SDLK_ESCAPE:
                         mRunning = false;
                         break;
-                    // case SDLK_LEFT:
-                        // if (mSprite != nullptr) mSprite->NextSprite();
-                        // break;
+                    case SDLK_LEFT:
+                        if (mSprite != nullptr) mSprite->Turn();
+                        break;
                     default:
                         break;
                 }
