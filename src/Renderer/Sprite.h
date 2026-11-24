@@ -8,14 +8,20 @@ public:
     Sprite() {};
     Sprite(SDL_Renderer* renderer, const std::string& imagePath, const SDL_FRect& dstRect) {
         SDL_Surface* surface = SDL_LoadBMP(imagePath.c_str());
+        // vecteezy walk sprites
+        // 1920x1280
+        // 320x640
         if (surface == nullptr) {
             std::cerr << "Failed to load BMP: " << SDL_GetError() << std::endl;
             assert(0 && "Not able to load BMP");
         }
+        m_srcRect = SDL_FRect {0, 0, 640, 640}; // srcrect
+        m_totalXFrame = 3;
+        m_totalYFrame = 2;
 
         const SDL_PixelFormatDetails *pfd = SDL_GetPixelFormatDetails(surface->format);
-        Uint32 colorKey = SDL_MapRGB(pfd, nullptr, 0x00, 0x00, 0x00); // black color key
-        // blank out those black pixels to transparent
+        Uint32 colorKey = SDL_MapRGB(pfd, nullptr, 0xFF, 0xFF, 0xFF); // white color key
+        // blank out those white pixels to transparent
         SDL_SetSurfaceColorKey(surface, true, colorKey);
 
         mTexture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -51,7 +57,7 @@ public:
         SDL_RenderTexture(
             renderer,
             mTexture,
-            nullptr, // portion of texture to draw
+            &m_srcRect, // portion of texture to draw
             &m_dstRect // portion of window to draw
         );
     }
@@ -66,9 +72,35 @@ public:
         m_dstRect.h = h;
     }
 
+    void Tick(Uint64 deltaTime) {
+        elapsedTime += deltaTime;
+        if (elapsedTime > 400) {
+            NextSprite();
+            elapsedTime = 0;
+        }
+    }
+
+    void NextSprite() {
+        if (m_xFrameIndex < m_totalXFrame - 1) {
+            ++m_xFrameIndex;
+        } else if (m_yFrameIndex < m_totalYFrame - 1) {
+            ++m_yFrameIndex;
+            m_xFrameIndex = 0;
+        } else {
+            m_xFrameIndex = 0;
+            m_yFrameIndex = 0;
+        }
+        m_srcRect.x = static_cast<float>(m_xFrameIndex * m_srcRect.w);
+        m_srcRect.y = static_cast<float>(m_yFrameIndex * m_srcRect.h);
+    }
+
 private:
     SDL_Texture* mTexture;
     SDL_FRect m_dstRect;
-    int m_x;
-    int m_y;
+    SDL_FRect m_srcRect;
+    int m_xFrameIndex = 0;
+    int m_yFrameIndex = 0;
+    int m_totalXFrame;
+    int m_totalYFrame;
+    Uint64 elapsedTime = 0;
 };

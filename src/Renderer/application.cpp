@@ -43,9 +43,9 @@ struct SDLApplication {
     void SetupSceneData() {
         const char* basePath = SDL_GetBasePath();
         std::string assetFolder = std::string(basePath) + "Assets/";
-        SDL_FRect spriteRect = { 0, 0, 640, 480 };
+        SDL_FRect spriteRect = { 200, 50, 360, 360 };
         // SDL_FRect spriteRect = { 0, 0, 400, 280 };
-        mSprite = new Sprite(renderer, std::string(assetFolder) + "sample.bmp", spriteRect);
+        mSprite = new Sprite(renderer, std::string(assetFolder) + "vecteezy.bmp", spriteRect);
     }
 
     // Destructor
@@ -56,9 +56,9 @@ struct SDLApplication {
         SDL_Quit();
     }
 
-    void Tick() {
+    void Tick(Uint64 deltaTime) {
         Input();
-        Update();
+        Update(deltaTime);
         Render();
     }
 
@@ -73,6 +73,9 @@ struct SDLApplication {
                     case SDLK_ESCAPE:
                         mRunning = false;
                         break;
+                    // case SDLK_LEFT:
+                        // if (mSprite != nullptr) mSprite->NextSprite();
+                        // break;
                     default:
                         break;
                 }
@@ -101,7 +104,9 @@ struct SDLApplication {
         // SDL_Log("Mouse Button State: %d", mouse);
     }
 
-    void Update() {}
+    void Update(Uint64 deltaTime) {
+        if (mSprite != nullptr) mSprite->Tick(deltaTime);
+    }
 
     void Render() {
         SDL_Surface* windowSurface = SDL_GetWindowSurface(window);
@@ -128,14 +133,15 @@ struct SDLApplication {
         
         Uint64 fps = 0;
         Uint64 lastTime = 0;
+        Uint64 deltaTime = 0;
         while (mRunning) {
             Uint64 currentTime = SDL_GetTicks();
             // each frame
-            Tick();
+            Tick(deltaTime);
             SDL_Delay(16); // ~16ms, fps = 1000ms(1s) / 16ms(1 frame)
             fps++;
             // Per frame calculation of elapsed time
-            Uint64 deltaTime = SDL_GetTicks() - currentTime;
+            deltaTime = SDL_GetTicks() - currentTime;
 
             // FPS calculation
             if (currentTime > lastTime + 1000) {
