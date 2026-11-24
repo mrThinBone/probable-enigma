@@ -37,7 +37,7 @@ set(
 )
 
 add_executable(SDLTryOut
-  src/main.cpp
+  src/Renderer/application.cpp
 )
 
 target_include_directories(SDLTryOut PRIVATE
