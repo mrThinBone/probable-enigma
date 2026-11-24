@@ -30,6 +30,9 @@ public:
         SDL_SetSurfaceColorKey(surface, true, colorKey);
 
         mTexture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_SetTextureScaleMode(mTexture, SDL_SCALEMODE_LINEAR); // default: low quality
+        // _NEAREST: improve quality, _PIXELART: highest quality
+        
         SDL_DestroySurface(surface);
 
         m_dstRect = dstRect;
