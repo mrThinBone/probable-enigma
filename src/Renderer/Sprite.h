@@ -12,6 +12,12 @@ public:
             std::cerr << "Failed to load BMP: " << SDL_GetError() << std::endl;
             assert(0 && "Not able to load BMP");
         }
+
+        const SDL_PixelFormatDetails *pfd = SDL_GetPixelFormatDetails(surface->format);
+        Uint32 colorKey = SDL_MapRGB(pfd, nullptr, 0x00, 0x00, 0x00); // black color key
+        // blank out those black pixels to transparent
+        SDL_SetSurfaceColorKey(surface, true, colorKey);
+
         mTexture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_DestroySurface(surface);
 

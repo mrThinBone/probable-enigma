@@ -112,7 +112,7 @@ struct SDLApplication {
         }*/
 
         // Clear the screen with a solid color
-        SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
+        SDL_SetRenderDrawColor(renderer, 0x32, 0x73, 0xa8, 0xFF);
         SDL_RenderClear(renderer);
         
         // draw operation in between
