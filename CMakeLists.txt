@@ -15,6 +15,15 @@ project(
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include(FetchContent)
+
+FetchContent_Declare(
+  glm
+  GIT_REPOSITORY https://github.com/g-truc/glm.git
+  GIT_TAG 1.0.2
+)
+FetchContent_MakeAvailable(glm)
+
 # ${CMAKE_BINARY_DIR} refers to the directory where we generate our build, which we've configured in our presets to be the /build directory.
 # $<CONFIGURATION> is a special "generator expression" that CMake replaces with the current build type (e.g., Debug, Release).
 set(
@@ -29,6 +38,10 @@ set(
 
 add_executable(SDLTryOut
   src/main.cpp
+)
+
+target_include_directories(SDLTryOut PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 if(APPLE)
@@ -59,4 +72,5 @@ target_link_libraries(SDLTryOut
   SDL3::SDL3 
   SDL3_image::SDL3_image 
   SDL3_ttf::SDL3_ttf 
+  glm::glm-header-only 
 )
